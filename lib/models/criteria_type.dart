@@ -1,0 +1,1 @@
+enum CriteriaType { error, recommendation }
