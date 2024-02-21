@@ -21,7 +21,30 @@ class CriteriaComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     return CheckboxListTile(
         value: list.contains(element),
-        title: Text(element.reason),
+        title: Row(
+          children: [
+            Expanded(child: Text(element.reason)),
+            if (element.desc.isNotEmpty)
+              IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: ((BuildContext context) {
+                          return AlertDialog.adaptive(
+                            title: Text(element.desc),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Закрыть'))
+                            ],
+                          );
+                        }));
+                  },
+                  icon: const Icon(Icons.question_mark))
+          ],
+        ),
         onChanged: (bool? e) {
           e == true ? onAdd() : onDelete();
         });

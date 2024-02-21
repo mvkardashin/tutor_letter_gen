@@ -7,24 +7,28 @@ class CriteriasState {
   final bool canUpdate;
   final String fetchedCriterias;
   final Criterias criterias;
+  final Criterias filteredCriterias;
 
-  CriteriasState({
-    required this.status,
-    required this.canUpdate,
-    required this.fetchedCriterias,
-    required this.criterias,
-  });
+  CriteriasState(
+      {required this.status,
+      required this.canUpdate,
+      required this.fetchedCriterias,
+      required this.criterias,
+      required this.filteredCriterias});
 
-  CriteriasState copyWith(
-      {Status? status,
-      Criterias? criterias,
-      bool? canUpdate,
-      String? fetchedCriterias}) {
+  CriteriasState copyWith({
+    Status? status,
+    Criterias? criterias,
+    Criterias? filteredCriterias,
+    bool? canUpdate,
+    String? fetchedCriterias,
+  }) {
     return CriteriasState(
         status: status ?? this.status,
         criterias: criterias ?? this.criterias,
         canUpdate: canUpdate ?? this.canUpdate,
-        fetchedCriterias: fetchedCriterias ?? this.fetchedCriterias);
+        fetchedCriterias: fetchedCriterias ?? this.fetchedCriterias,
+        filteredCriterias: filteredCriterias ?? this.filteredCriterias);
   }
 
   @override
@@ -35,7 +39,8 @@ class CriteriasState {
     return status.hashCode ^
         canUpdate.hashCode ^
         fetchedCriterias.hashCode ^
-        criterias.hashCode;
+        criterias.hashCode ^
+        filteredCriterias.hashCode;
   }
 
   @override
@@ -45,6 +50,7 @@ class CriteriasState {
     return other.status == status &&
         other.canUpdate == canUpdate &&
         other.fetchedCriterias == fetchedCriterias &&
-        other.criterias == criterias;
+        other.criterias == criterias &&
+        other.filteredCriterias == filteredCriterias;
   }
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tutor_letter_gen/bloc/criterias/criterias_bloc.dart';
 
-import 'package:tutor_letter_gen/bloc/criterias/criterias_state.dart';
-import 'package:tutor_letter_gen/components/criterias_list.dart';
-import 'package:tutor_letter_gen/models/status.dart';
+import '/bloc/criterias/criterias_bloc.dart';
+import '/bloc/criterias/criterias_state.dart';
+import '/components/criterias_list.dart';
+import '/models/status.dart';
 
 class CriteriasPad extends StatelessWidget {
   const CriteriasPad({super.key});
