@@ -51,7 +51,7 @@ class LetterState {
     for (Criteria e in errors) {
       errorsText = errorsText + e.htmlLi;
     }
-    return '<ul>$errorsText</ul>';
+    return errorsText;
   }
 
   String get recsHtml {
@@ -59,14 +59,14 @@ class LetterState {
     for (Criteria e in recommendation) {
       recsText = recsText + e.htmlLi;
     }
-    return '<ul>$recsText</ul>';
+    return recsText;
   }
 
   String get greetingsHtml => '<div>$greetings</div>';
   String get acceptTeacherHtml => '<div>$acceptTeacher</div>';
   String get deniedTeacherHtml => '<div>$deniedTeacher</div>';
   String get errorsHeadlineHtml => '<h2>$errorsHeadline</h2>';
-  String get recsHeadlineHtml => '<h2>$recsHeadline</h2>';
+  String get recsHeadlineHtml => '<p>$recsHeadline</p>';
 
   String get toText =>
       greetings +
