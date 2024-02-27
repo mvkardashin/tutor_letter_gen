@@ -77,12 +77,12 @@ class LetterState {
       recsText;
 
   String get toHtml =>
-      greetingsHtml +
+      '<html><body>'+greetingsHtml +
       (errors.isEmpty ? acceptTeacherHtml : deniedTeacherHtml) +
       (errors.isEmpty ? '' : errorsHeadlineHtml) +
       errorsHtml +
       (recommendation.isEmpty ? '' : recsHeadlineHtml) +
-      recsHtml;
+      recsHtml+'</body></html>';
 
   LetterState copyWith({
     String? greetings,
