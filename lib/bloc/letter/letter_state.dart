@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:tutor_letter_gen/models/criteria.dart';
 
 class LetterState {
@@ -84,13 +83,15 @@ class LetterState {
       (errors.isEmpty ? '' : endText);
 
   String get toHtml =>
+      '<html><body>' +
       (errors.isEmpty ? '' : greetingsHtml) +
       (errors.isEmpty ? acceptTeacherHtml : deniedTeacherHtml) +
       (errors.isEmpty ? '' : errorsHeadlineHtml) +
       errorsHtml +
       (recommendation.isEmpty ? '' : recsHeadlineHtml) +
       recsHtml +
-      (errors.isEmpty ? '' : endTextHtml);
+      (errors.isEmpty ? '' : endTextHtml) +
+      '</body></html>';
 
   LetterState copyWith({
     List<Criteria>? errors,
