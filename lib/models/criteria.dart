@@ -35,7 +35,7 @@ class Criteria {
         id: id ?? this.id);
   }
 
-  String get htmlLi => "<li'>$html</li>";
+  String get htmlLi => "<ul><li>$html</li></ul><p>  <br></p>";
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'type': type.toString(),
