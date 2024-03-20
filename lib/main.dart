@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:rich_clipboard/rich_clipboard.dart';
-import '/bloc/letter/letter_bloc.dart';
-import '/bloc/letter/letter_state.dart';
 
+import 'bloc/letter/letter_bloc.dart';
+import 'bloc/letter/letter_state.dart';
 import 'bloc/criterias/criterias_bloc.dart';
 import 'bloc/criterias/criterias_event.dart';
+import 'models/status.dart';
 import 'screens/criterias_pad.dart';
 
 void main() {
@@ -71,7 +72,19 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: const Text('Обновить списки')),
                 )
-              : Container()
+              : Padding(
+                  padding: const EdgeInsets.only(right: 20.0),
+                  child: context.watch<CriteriasBloc>().state.status ==
+                          Status.download
+                      ? const CircularProgressIndicator.adaptive()
+                      : ElevatedButton(
+                          onPressed: () {
+                            context
+                                .read<CriteriasBloc>()
+                                .add(FetchLocalCriterias());
+                          },
+                          child: const Text('Проверить обновления')),
+                )
         ],
       ),
       body: Row(

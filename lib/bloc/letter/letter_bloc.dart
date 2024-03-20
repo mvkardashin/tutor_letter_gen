@@ -12,6 +12,7 @@ class LetterBloc extends Bloc<LetterEvent, LetterState> {
   LetterBloc() : super(LetterState.init()) {
     on<AddInLetter>(_onAddInLetter);
     on<DeleteFromLetter>(_onDeleteFromLetter);
+    on<CleanLetter>(_onCleanLetter);
   }
 
   FutureOr<void> _onAddInLetter(AddInLetter event, Emitter<LetterState> emit) {
@@ -37,5 +38,9 @@ class LetterBloc extends Bloc<LetterEvent, LetterState> {
       recs.remove(event.criteria);
       emit(state.copyWith(recommendation: recs));
     }
+  }
+
+  FutureOr<void> _onCleanLetter(CleanLetter event, Emitter<LetterState> emit) {
+    emit(LetterState.init());
   }
 }

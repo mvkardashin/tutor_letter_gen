@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:tutor_letter_gen/models/criteria_type.dart';
+import '/models/criteria_type.dart';
 
 class Criteria {
   final CriteriaType type;
@@ -35,7 +35,7 @@ class Criteria {
         id: id ?? this.id);
   }
 
-  String get htmlLi => "$html<p><br></p>";
+  String get htmlLi => "<li'>$html</li>";
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'type': type.toString(),

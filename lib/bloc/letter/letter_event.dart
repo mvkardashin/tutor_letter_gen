@@ -13,3 +13,5 @@ class DeleteFromLetter extends LetterEvent {
 
   DeleteFromLetter({required this.criteria});
 }
+
+class CleanLetter extends LetterEvent {}

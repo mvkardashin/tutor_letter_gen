@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tutor_letter_gen/bloc/letter/letter_bloc.dart';
-import 'package:tutor_letter_gen/bloc/letter/letter_event.dart';
 
-import '../bloc/criterias/criterias_event.dart';
-import '../bloc/criterias/criterias_state.dart';
+import '/bloc/criterias/criterias_event.dart';
+import '/bloc/criterias/criterias_state.dart';
 import '/bloc/criterias/criterias_bloc.dart';
+import '/bloc/letter/letter_bloc.dart';
+import '/bloc/letter/letter_event.dart';
 import '/components/criteria_component.dart';
 
 class CriteriasList extends StatefulWidget {
@@ -27,9 +27,19 @@ class _CriteriasListState extends State<CriteriasList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Фильтр',
-              style: Theme.of(context).textTheme.headlineMedium,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Фильтр',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      context.read<LetterBloc>().add(CleanLetter());
+                    },
+                    child: Text('Сбросить ошибки и рек.'))
+              ],
             ),
             Padding(
               padding: const EdgeInsets.only(right: 20.0),
@@ -40,7 +50,17 @@ class _CriteriasListState extends State<CriteriasList> {
                       .read<CriteriasBloc>()
                       .add(FilterCriterias(filter: _editingController.text));
                 },
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                        tooltip: 'Очистить содержимое',
+                        onPressed: () {
+                          setState(() {
+                            _editingController.text = '';
+                            context.read<CriteriasBloc>().add(FilterCriterias(
+                                filter: _editingController.text));
+                          });
+                        },
+                        icon: const Icon(Icons.close)),
                     labelText: 'Поиск по заголовкам причин'),
               ),
             ),

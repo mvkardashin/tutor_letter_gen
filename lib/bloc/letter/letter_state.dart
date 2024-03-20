@@ -7,6 +7,7 @@ class LetterState {
   final String deniedTeacher;
   final String errorsHeadline;
   final String recsHeadline;
+  final String endText;
   final List<Criteria> errors;
   final List<Criteria> recommendation;
 
@@ -16,6 +17,7 @@ class LetterState {
     required this.deniedTeacher,
     required this.errorsHeadline,
     required this.recsHeadline,
+    required this.endText,
     required this.errors,
     required this.recommendation,
   });
@@ -27,6 +29,7 @@ class LetterState {
           'Ваша анкета возвращена на доработку. Для допуска нужно исправить:',
       this.errorsHeadline = 'Причины возврата',
       this.recsHeadline = 'Рекомендации',
+      this.endText = 'Рекомендации',
       this.errors = const <Criteria>[],
       this.recommendation = const <Criteria>[]});
 
@@ -51,7 +54,7 @@ class LetterState {
     for (Criteria e in errors) {
       errorsText = errorsText + e.htmlLi;
     }
-    return errorsText;
+    return "<ul>$errorsText</ul>";
   }
 
   String get recsHtml {
@@ -59,47 +62,48 @@ class LetterState {
     for (Criteria e in recommendation) {
       recsText = recsText + e.htmlLi;
     }
-    return recsText;
+    return "<ul>$recsText</ul>";
   }
 
   String get greetingsHtml => '<div>$greetings</div>';
   String get acceptTeacherHtml => '<div>$acceptTeacher</div>';
   String get deniedTeacherHtml => '<div>$deniedTeacher</div>';
-  String get errorsHeadlineHtml => '<h2>$errorsHeadline</h2>';
-  String get recsHeadlineHtml => '<p>$recsHeadline</p>';
-
+  String get errorsHeadlineHtml =>
+      '<h2 style="padding-left:20px">$errorsHeadline</h2>';
+  String get recsHeadlineHtml =>
+      '<h2 style="padding-left:20px">$recsHeadline</h2>';
+  String get endTextHtml =>
+      '<p>Пожалуйста, не забудьте, после внесения изменений, отправить анкету на проверку.</p>';
   String get toText =>
-      greetings +
+      (errors.isEmpty ? '' : greetings) +
       (errors.isEmpty ? acceptTeacher : deniedTeacher) +
       (errors.isEmpty ? '' : errorsHeadline) +
       errorsText +
       (recommendation.isEmpty ? '' : recsHeadline) +
-      recsText;
+      recsText +
+      (errors.isEmpty ? '' : endText);
 
   String get toHtml =>
-      greetingsHtml +
+      (errors.isEmpty ? '' : greetingsHtml) +
       (errors.isEmpty ? acceptTeacherHtml : deniedTeacherHtml) +
       (errors.isEmpty ? '' : errorsHeadlineHtml) +
       errorsHtml +
       (recommendation.isEmpty ? '' : recsHeadlineHtml) +
-      recsHtml;
+      recsHtml +
+      (errors.isEmpty ? '' : endTextHtml);
 
   LetterState copyWith({
-    String? greetings,
-    String? acceptTeacher,
-    String? deniedTeacher,
-    String? errorsHeadline,
-    String? recsHeadline,
     List<Criteria>? errors,
     List<Criteria>? recommendation,
   }) {
     return LetterState(
-        greetings: greetings ?? this.greetings,
-        acceptTeacher: acceptTeacher ?? this.acceptTeacher,
-        deniedTeacher: deniedTeacher ?? this.deniedTeacher,
+        greetings: greetings,
+        acceptTeacher: acceptTeacher,
+        deniedTeacher: deniedTeacher,
         errors: errors ?? this.errors,
+        endText: endText,
         recommendation: recommendation ?? this.recommendation,
-        errorsHeadline: errorsHeadline ?? this.errorsHeadline,
-        recsHeadline: recsHeadline ?? this.recsHeadline);
+        errorsHeadline: errorsHeadline,
+        recsHeadline: recsHeadline);
   }
 }
