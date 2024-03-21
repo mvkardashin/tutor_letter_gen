@@ -38,7 +38,7 @@ class _CriteriasListState extends State<CriteriasList> {
                     onPressed: () {
                       context.read<LetterBloc>().add(CleanLetter());
                     },
-                    child: Text('Сбросить ошибки и рек.'))
+                    child: const Text('Сбросить ошибки и рек.'))
               ],
             ),
             Padding(

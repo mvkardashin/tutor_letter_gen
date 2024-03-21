@@ -59,7 +59,9 @@ class CriteriasBloc extends Bloc<CriteriasEvent, CriteriasState> {
               fetchedCriterias: sheetsCriterias,
               canUpdate: true));
         }
-      } catch (e) {}
+      } catch (e) {
+        //
+      }
     }
   }
 

@@ -14,9 +14,9 @@ class CriteriasPad extends StatelessWidget {
     return BlocBuilder<CriteriasBloc, CriteriasState>(
         builder: (context, state) {
       return switch (state.status) {
-        Status.download => CircularProgressIndicator.adaptive(),
-        Status.loaded => CriteriasList(),
-        Status.error => Text('Ошибка'),
+        Status.download => const CircularProgressIndicator.adaptive(),
+        Status.loaded => const CriteriasList(),
+        Status.error => const Text('Ошибка'),
       };
     });
   }

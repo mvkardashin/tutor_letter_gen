@@ -7,6 +7,7 @@ class LetterState {
   final String errorsHeadline;
   final String recsHeadline;
   final String endText;
+  final String withRespect;
   final List<Criteria> errors;
   final List<Criteria> recommendation;
 
@@ -18,6 +19,7 @@ class LetterState {
     required this.recsHeadline,
     required this.endText,
     required this.errors,
+    required this.withRespect,
     required this.recommendation,
   });
 
@@ -28,7 +30,9 @@ class LetterState {
           'Ваша анкета возвращена на доработку. Для допуска нужно исправить:',
       this.errorsHeadline = 'Причины возврата',
       this.recsHeadline = 'Рекомендации',
-      this.endText = 'Рекомендации',
+      this.endText =
+          'Пожалуйста, не забудьте, после внесения изменений, отправить анкету на проверку',
+      this.withRespect = 'С уважением, администратор Сервиса',
       this.errors = const <Criteria>[],
       this.recommendation = const <Criteria>[]});
 
@@ -53,7 +57,7 @@ class LetterState {
     for (Criteria e in errors) {
       errorsText = errorsText + e.htmlLi;
     }
-    return "$errorsText";
+    return errorsText;
   }
 
   String get recsHtml {
@@ -61,7 +65,7 @@ class LetterState {
     for (Criteria e in recommendation) {
       recsText = recsText + e.htmlLi;
     }
-    return "$recsText";
+    return recsText;
   }
 
   String get greetingsHtml => '<div>$greetings</div>';
@@ -71,8 +75,8 @@ class LetterState {
       '<h2 style="padding-left:20px">$errorsHeadline</h2>';
   String get recsHeadlineHtml =>
       '<h2 style="padding-left:20px">$recsHeadline</h2>';
-  String get endTextHtml =>
-      '<p>Пожалуйста, не забудьте, после внесения изменений, отправить анкету на проверку.</p>';
+  String get endTextHtml => '<p>$endText</p>';
+  String get withRespectHtml => '<p>$withRespect</p>';
   String get toText =>
       (errors.isEmpty ? '' : greetings) +
       (errors.isEmpty ? acceptTeacher : deniedTeacher) +
@@ -80,7 +84,8 @@ class LetterState {
       errorsText +
       (recommendation.isEmpty ? '' : recsHeadline) +
       recsText +
-      (errors.isEmpty ? '' : endText);
+      (errors.isEmpty ? '' : endText) +
+      withRespect;
 
   String get toHtml =>
       '<html><body>' +
@@ -91,6 +96,7 @@ class LetterState {
       (recommendation.isEmpty ? '' : recsHeadlineHtml) +
       recsHtml +
       (errors.isEmpty ? '' : endTextHtml) +
+      withRespectHtml +
       '</body></html>';
 
   LetterState copyWith({
@@ -102,6 +108,7 @@ class LetterState {
         acceptTeacher: acceptTeacher,
         deniedTeacher: deniedTeacher,
         errors: errors ?? this.errors,
+        withRespect: withRespect,
         endText: endText,
         recommendation: recommendation ?? this.recommendation,
         errorsHeadline: errorsHeadline,
