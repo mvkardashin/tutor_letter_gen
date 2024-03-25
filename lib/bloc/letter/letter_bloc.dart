@@ -13,6 +13,8 @@ class LetterBloc extends Bloc<LetterEvent, LetterState> {
     on<AddInLetter>(_onAddInLetter);
     on<DeleteFromLetter>(_onDeleteFromLetter);
     on<CleanLetter>(_onCleanLetter);
+    // on<SetDecoration>(_onSetDecoration);
+    // on<FetchSettings>(_onFetchSettings);
   }
 
   FutureOr<void> _onAddInLetter(AddInLetter event, Emitter<LetterState> emit) {
@@ -43,4 +45,16 @@ class LetterBloc extends Bloc<LetterEvent, LetterState> {
   FutureOr<void> _onCleanLetter(CleanLetter event, Emitter<LetterState> emit) {
     emit(LetterState.init());
   }
+
+  // FutureOr<void> _onSetDecoration(
+  //     SetDecoration event, Emitter<LetterState> emit) {
+  //   emit(state.copyWith(decoration: event.decoration));
+  //   SP.setDecoration(event.decoration);
+  // }
+
+  // FutureOr<void> _onFetchSettings(
+  //     FetchSettings event, Emitter<LetterState> emit) async {
+  //   int decorationValue = await SP.getDecoration();
+  //   emit(state.copyWith(decoration: decorationValue));
+  // }
 }

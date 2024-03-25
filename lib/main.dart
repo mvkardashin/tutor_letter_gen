@@ -84,7 +84,55 @@ class _HomePageState extends State<HomePage> {
                                 .add(FetchLocalCriterias());
                           },
                           child: const Text('Проверить обновления')),
-                )
+                ),
+          // ElevatedButton.icon(
+          //   label: Text('Настройки'),
+          //   onPressed: () {
+          //     showDialog(
+          //         context: context,
+          //         builder: (BuildContext context) {
+          //           return AlertDialog(
+          //             title: Text('Оформление ошибок и рекомендаций'),
+          //             content: SingleChildScrollView(
+          //                 child: Column(
+          //               children: [
+          //                 RadioListTile<int>(
+          //                     title: Text('Маркированный список'),
+          //                     value: 0,
+          //                     groupValue:
+          //                         context.watch<LetterBloc>().state.decoration,
+          //                     onChanged: (value) {
+          //                       context
+          //                           .read<LetterBloc>()
+          //                           .add(SetDecoration(decoration: value ?? 0));
+          //                     }),
+          //                 RadioListTile<int>(
+          //                     title: Text('Тире'),
+          //                     value: 1,
+          //                     groupValue:
+          //                         context.watch<LetterBloc>().state.decoration,
+          //                     onChanged: (value) {
+          //                       context
+          //                           .read<LetterBloc>()
+          //                           .add(SetDecoration(decoration: value ?? 0));
+          //                     }),
+          //                 RadioListTile<int>(
+          //                     title: Text('Отсутствует'),
+          //                     value: 2,
+          //                     groupValue:
+          //                         context.watch<LetterBloc>().state.decoration,
+          //                     onChanged: (value) {
+          //                       context
+          //                           .read<LetterBloc>()
+          //                           .add(SetDecoration(decoration: value ?? 0));
+          //                     }),
+          //               ],
+          //             )),
+          //           );
+          //         });
+          //   },
+          //   icon: const Icon(Icons.settings),
+          // )
         ],
       ),
       body: Row(
@@ -118,7 +166,7 @@ class _HomePageState extends State<HomePage> {
         tooltip: 'Copy',
         label: const Text('Копировать письмо'),
         icon: const Icon(Icons.copy),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }

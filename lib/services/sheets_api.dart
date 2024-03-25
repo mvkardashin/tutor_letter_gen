@@ -22,7 +22,7 @@ abstract class SheetsAPI {
         base = base.copyWith(errors: errors, recs: recs);
       }
     } catch (e) {
-      // print(e);
+      base = Criterias(errors: [], recs: []);
     }
 
     return base;
@@ -36,9 +36,10 @@ abstract class SheetsAPI {
 
       if (response.statusCode == 200) {
         resp = response.body;
-        // print(response.body);
       }
-    } catch (e) {}
+    } catch (e) {
+      resp = '';
+    }
     return resp;
   }
 }

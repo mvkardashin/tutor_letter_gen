@@ -31,8 +31,8 @@ class LetterState {
       this.errorsHeadline = 'Причины возврата',
       this.recsHeadline = 'Рекомендации',
       this.endText =
-          'Пожалуйста, не забудьте, после внесения изменений, отправить анкету на проверку',
-      this.withRespect = 'С уважением, администратор Сервиса',
+          'Пожалуйста, не забудьте, после внесения изменений, отправить анкету на проверку.',
+      this.withRespect = 'С уважением, администратор Сервиса.',
       this.errors = const <Criteria>[],
       this.recommendation = const <Criteria>[]});
 
@@ -96,7 +96,7 @@ class LetterState {
       (recommendation.isEmpty ? '' : recsHeadlineHtml) +
       recsHtml +
       (errors.isEmpty ? '' : endTextHtml) +
-      withRespectHtml +
+      (errors.isEmpty ? withRespectHtml : '') +
       '</body></html>';
 
   LetterState copyWith({
