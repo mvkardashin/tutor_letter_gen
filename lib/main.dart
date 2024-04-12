@@ -140,11 +140,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           const Padding(
             padding: EdgeInsets.all(8.0),
-            child: SizedBox(
-              child: SingleChildScrollView(
-                child: CriteriasPad(),
-              ),
-            ),
+            child: CriteriasPad(),
           ),
           const Divider(
             height: 10,
