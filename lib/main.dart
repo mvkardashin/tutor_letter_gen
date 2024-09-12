@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:rich_clipboard/rich_clipboard.dart';
+import 'package:tutor_letter_gen/bloc/email_answers/email_answers_bloc.dart';
+import 'package:tutor_letter_gen/bloc/email_answers/email_answers_event.dart';
+import 'package:tutor_letter_gen/bloc/email_letter/email_letter_bloc.dart';
 
 import 'bloc/letter/letter_bloc.dart';
-import 'bloc/letter/letter_state.dart';
+
 import 'bloc/criterias/criterias_bloc.dart';
 import 'bloc/criterias/criterias_event.dart';
-import 'models/status.dart';
-import 'screens/criterias_pad.dart';
+import 'router/router.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final _appRouter = AppRouter();
 
   @override
   Widget build(BuildContext context) {
@@ -28,141 +29,23 @@ class MyApp extends StatelessWidget {
           BlocProvider<LetterBloc>(
             lazy: false,
             create: (context) => LetterBloc(),
-          )
+          ),
+          BlocProvider<EmailAnswersBloc>(
+            lazy: false,
+            create: (context) =>
+                EmailAnswersBloc()..add(FetchLocalEmailAnswers()),
+          ),
+          BlocProvider<EmailLetterBloc>(
+            lazy: false,
+            create: (context) => EmailLetterBloc(),
+          ),
         ],
-        child: MaterialApp(
-          title: 'Письмо репетитору',
+        child: MaterialApp.router(
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             useMaterial3: true,
           ),
-          home: const HomePage(title: 'Письмо репетитору'),
+          routerConfig: _appRouter.config(),
         ));
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
-  final String title;
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  void copy() async {
-    await RichClipboard.setData(RichClipboardData(
-        text: context.read<LetterBloc>().state.toText,
-        html: context.read<LetterBloc>().state.toHtml));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-        actions: [
-          context.watch<CriteriasBloc>().state.canUpdate
-              ? Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
-                  child: ElevatedButton(
-                      onPressed: () {
-                        context.read<CriteriasBloc>().add(UpdateCriterias());
-                      },
-                      child: const Text('Обновить списки')),
-                )
-              : Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
-                  child: context.watch<CriteriasBloc>().state.status ==
-                          Status.download
-                      ? const CircularProgressIndicator.adaptive()
-                      : ElevatedButton(
-                          onPressed: () {
-                            context
-                                .read<CriteriasBloc>()
-                                .add(FetchLocalCriterias());
-                          },
-                          child: const Text('Проверить обновления')),
-                ),
-          // ElevatedButton.icon(
-          //   label: Text('Настройки'),
-          //   onPressed: () {
-          //     showDialog(
-          //         context: context,
-          //         builder: (BuildContext context) {
-          //           return AlertDialog(
-          //             title: Text('Оформление ошибок и рекомендаций'),
-          //             content: SingleChildScrollView(
-          //                 child: Column(
-          //               children: [
-          //                 RadioListTile<int>(
-          //                     title: Text('Маркированный список'),
-          //                     value: 0,
-          //                     groupValue:
-          //                         context.watch<LetterBloc>().state.decoration,
-          //                     onChanged: (value) {
-          //                       context
-          //                           .read<LetterBloc>()
-          //                           .add(SetDecoration(decoration: value ?? 0));
-          //                     }),
-          //                 RadioListTile<int>(
-          //                     title: Text('Тире'),
-          //                     value: 1,
-          //                     groupValue:
-          //                         context.watch<LetterBloc>().state.decoration,
-          //                     onChanged: (value) {
-          //                       context
-          //                           .read<LetterBloc>()
-          //                           .add(SetDecoration(decoration: value ?? 0));
-          //                     }),
-          //                 RadioListTile<int>(
-          //                     title: Text('Отсутствует'),
-          //                     value: 2,
-          //                     groupValue:
-          //                         context.watch<LetterBloc>().state.decoration,
-          //                     onChanged: (value) {
-          //                       context
-          //                           .read<LetterBloc>()
-          //                           .add(SetDecoration(decoration: value ?? 0));
-          //                     }),
-          //               ],
-          //             )),
-          //           );
-          //         });
-          //   },
-          //   icon: const Icon(Icons.settings),
-          // )
-        ],
-      ),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CriteriasPad(),
-          ),
-          const Divider(
-            height: 10,
-            color: Colors.black,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: BlocBuilder<LetterBloc, LetterState>(
-                  builder: (context, state) {
-                return SingleChildScrollView(child: HtmlWidget(state.toHtml));
-              }),
-            ),
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: copy,
-        tooltip: 'Copy',
-        label: const Text('Копировать письмо'),
-        icon: const Icon(Icons.copy),
-      ),
-    );
   }
 }
