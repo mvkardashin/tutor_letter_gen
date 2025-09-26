@@ -16,6 +16,7 @@ class EmailAnswersPad extends StatelessWidget {
         Status.download => const CircularProgressIndicator.adaptive(),
         Status.loaded => const EmailAnswersList(),
         Status.error => const Text('Ошибка'),
+        Status.checkUpdate => const CircularProgressIndicator.adaptive(),
       };
     });
   }

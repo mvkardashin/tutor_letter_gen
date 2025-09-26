@@ -10,12 +10,12 @@ class CriteriaComponent extends StatelessWidget {
   final Function onAdd;
   final Function onDelete;
   const CriteriaComponent({
-    Key? key,
+    super.key,
     required this.list,
     required this.element,
     required this.onAdd,
     required this.onDelete,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

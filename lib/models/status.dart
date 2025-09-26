@@ -1,1 +1,6 @@
-enum Status { download, loaded, error }
+enum Status {
+  download,
+  loaded,
+  error,
+  checkUpdate,
+}

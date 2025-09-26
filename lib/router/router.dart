@@ -6,8 +6,9 @@ class AppRouter extends RootStackRouter {
   @override
   List<AutoRoute> get routes => [
         AutoRoute(page: TabsRoute.page, initial: true, children: [
+          AutoRoute(page: CheckTeacherRoute.page),
           AutoRoute(page: HomeRoute.page),
-          AutoRoute(page: EmailAnswerRoute.page),
+          // AutoRoute(page: EmailAnswerRoute.page),
         ])
       ];
 }

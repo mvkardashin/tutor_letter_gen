@@ -11,7 +11,7 @@ class LetterState {
   final List<Criteria> errors;
   final List<Criteria> recommendation;
 
-  LetterState({
+  const LetterState({
     required this.greetings,
     required this.acceptTeacher,
     required this.deniedTeacher,
@@ -23,95 +23,96 @@ class LetterState {
     required this.recommendation,
   });
 
-  LetterState.init(
-      {this.greetings = 'Здравствуйте!',
-      this.acceptTeacher = 'Ваша анкета опубликована.',
-      this.deniedTeacher =
-          'Ваша анкета возвращена на доработку. Для допуска нужно исправить:',
-      this.errorsHeadline = 'Причины возврата',
-      this.recsHeadline = 'Рекомендации',
-      this.endText =
-          'Пожалуйста, не забудьте, после внесения изменений, отправить анкету на проверку.',
-      this.withRespect = 'С уважением, администратор Сервиса.',
-      this.errors = const <Criteria>[],
-      this.recommendation = const <Criteria>[]});
+  const LetterState.init()
+      : greetings = 'Здравствуйте!',
+        acceptTeacher = 'Ваша анкета опубликована.',
+        deniedTeacher =
+            'Ваша анкета возвращена на доработку. Для допуска нужно исправить:',
+        errorsHeadline = 'Причины возврата',
+        recsHeadline = 'Рекомендации',
+        endText =
+            'Пожалуйста, не забудьте, после внесения изменений, отправить анкету на проверку.',
+        withRespect = 'С уважением, администратор Сервиса.',
+        errors = const <Criteria>[],
+        recommendation = const <Criteria>[];
 
-  String get errorsText {
-    String errorsText = '';
-    for (Criteria e in errors) {
-      errorsText = errorsText + e.value;
-    }
-    return errorsText;
+  String _buildListText(List<Criteria> items) {
+    return items.map((e) => e.value).join();
   }
 
-  String get recsText {
-    String recsText = '';
-    for (Criteria e in recommendation) {
-      recsText = recsText + e.value;
-    }
-    return recsText;
+  String _buildHtmlList(List<Criteria> items) {
+    final listItems = items.map((e) => e.htmlLi).join();
+    return "<ul>$listItems</ul>";
   }
 
-  String get errorsHtml {
-    String errorsText = '';
-    for (Criteria e in errors) {
-      errorsText = errorsText + e.htmlLi;
-    }
-    return "<ul>$errorsText</ul>";
+  String get errorsText => _buildListText(errors);
+  String get recsText => _buildListText(recommendation);
+  String get errorsHtml => _buildHtmlList(errors);
+  String get recsHtml => _buildHtmlList(recommendation);
+
+  String _wrapHtml(String text, String tag, {String? style}) {
+    final styleAttr = style != null ? ' style="$style"' : '';
+    return '<$tag$styleAttr>$text</$tag>';
   }
 
-  String get recsHtml {
-    String recsText = '';
-    for (Criteria e in recommendation) {
-      recsText = recsText + e.htmlLi;
-    }
-    return "<ul>$recsText</ul>";
-  }
-
-  String get greetingsHtml => '<div>$greetings</div>';
-  String get acceptTeacherHtml => '<div>$acceptTeacher</div>';
-  String get deniedTeacherHtml => '<div>$deniedTeacher</div>';
+  String get greetingsHtml => _wrapHtml(greetings, 'div');
+  String get acceptTeacherHtml => _wrapHtml(acceptTeacher, 'div');
+  String get deniedTeacherHtml => _wrapHtml(deniedTeacher, 'div');
   String get errorsHeadlineHtml =>
-      '<h2 style="padding-left:20px">$errorsHeadline</h2>';
+      _wrapHtml(errorsHeadline, 'h2', style: 'padding-left:20px');
   String get recsHeadlineHtml =>
-      '<h2 style="padding-left:20px">$recsHeadline</h2>';
-  String get endTextHtml => '<p>$endText</p>';
-  String get withRespectHtml => '<p>$withRespect</p>';
-  String get toText =>
-      (errors.isEmpty ? '' : greetings) +
-      (errors.isEmpty ? acceptTeacher : deniedTeacher) +
-      (errors.isEmpty ? '' : errorsHeadline) +
-      errorsText +
-      (recommendation.isEmpty ? '' : recsHeadline) +
-      recsText +
-      (errors.isEmpty ? '' : endText) +
-      withRespect;
+      _wrapHtml(recsHeadline, 'h2', style: 'padding-left:20px');
+  String get endTextHtml => _wrapHtml(endText, 'p');
+  String get withRespectHtml => _wrapHtml(withRespect, 'p');
 
-  String get toHtml =>
-      '<html><body>' +
-      (errors.isEmpty ? '' : greetingsHtml) +
-      (errors.isEmpty ? acceptTeacherHtml : deniedTeacherHtml) +
-      (errors.isEmpty ? '' : errorsHeadlineHtml) +
-      errorsHtml +
-      (recommendation.isEmpty ? '' : recsHeadlineHtml) +
-      recsHtml +
-      (errors.isEmpty ? '' : endTextHtml) +
-      (errors.isEmpty ? withRespectHtml : '') +
-      '</body></html>';
+  String get toText {
+    final hasErrors = errors.isNotEmpty;
+    final hasRecs = recommendation.isNotEmpty;
+
+    return [
+      if (hasErrors) greetings,
+      hasErrors ? deniedTeacher : acceptTeacher,
+      if (hasErrors) errorsHeadline,
+      errorsText,
+      if (hasRecs) recsHeadline,
+      recsText,
+      if (hasErrors) endText,
+      withRespect,
+    ].join();
+  }
+
+  String get toHtml {
+    final hasErrors = errors.isNotEmpty;
+    final hasRecs = recommendation.isNotEmpty;
+
+    final content = [
+      if (hasErrors) greetingsHtml,
+      hasErrors ? deniedTeacherHtml : acceptTeacherHtml,
+      if (hasErrors) errorsHeadlineHtml,
+      errorsHtml,
+      if (hasRecs) recsHeadlineHtml,
+      recsHtml,
+      if (hasErrors) endTextHtml,
+      if (!hasErrors) withRespectHtml,
+    ].join();
+
+    return '<html><body>$content</body></html>';
+  }
 
   LetterState copyWith({
     List<Criteria>? errors,
     List<Criteria>? recommendation,
   }) {
     return LetterState(
-        greetings: greetings,
-        acceptTeacher: acceptTeacher,
-        deniedTeacher: deniedTeacher,
-        errors: errors ?? this.errors,
-        withRespect: withRespect,
-        endText: endText,
-        recommendation: recommendation ?? this.recommendation,
-        errorsHeadline: errorsHeadline,
-        recsHeadline: recsHeadline);
+      greetings: greetings,
+      acceptTeacher: acceptTeacher,
+      deniedTeacher: deniedTeacher,
+      errors: errors ?? this.errors,
+      withRespect: withRespect,
+      endText: endText,
+      recommendation: recommendation ?? this.recommendation,
+      errorsHeadline: errorsHeadline,
+      recsHeadline: recsHeadline,
+    );
   }
 }

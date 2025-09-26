@@ -7,25 +7,57 @@ import '/bloc/criterias/criterias_event.dart';
 import '/bloc/letter/letter_bloc.dart';
 import '/models/status.dart';
 import '/screens/criterias_pad.dart';
-
-import '../bloc/criterias/criterias_bloc.dart';
-import '../bloc/letter/letter_state.dart';
+import '/bloc/criterias/criterias_bloc.dart';
+import '/bloc/letter/letter_state.dart';
 
 @RoutePage()
 class HomePage extends StatefulWidget {
-  const HomePage({
-    super.key,
-  });
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  void copy() async {
+  Future<void> _copyToClipboard() async {
+    final letterState = context.read<LetterBloc>().state;
     await RichClipboard.setData(RichClipboardData(
-        text: context.read<LetterBloc>().state.toText,
-        html: context.read<LetterBloc>().state.toHtml));
+      text: letterState.toText,
+      html: letterState.toHtml,
+    ));
+  }
+
+  Widget _buildUpdateButton() {
+    final criteriasBloc = context.watch<CriteriasBloc>();
+    final state = criteriasBloc.state;
+
+    if (state.status == Status.download) {
+      return const CircularProgressIndicator.adaptive();
+    }
+
+    if (state.canUpdate) {
+      return ElevatedButton(
+        onPressed: () => criteriasBloc.add(UpdateCriterias()),
+        child: const Text('Обновить списки'),
+      );
+    }
+
+    return state.status == Status.checkUpdate
+        ? const CircularProgressIndicator.adaptive()
+        : ElevatedButton(
+            onPressed: () => criteriasBloc.add(FetchLocalCriterias()),
+            child: const Text('Проверить обновления'),
+          );
+  }
+
+  Widget _buildLetterPreview() {
+    return BlocBuilder<LetterBloc, LetterState>(
+      builder: (context, state) {
+        return SingleChildScrollView(
+          child: HtmlWidget(state.toHtml),
+        );
+      },
+    );
   }
 
   @override
@@ -35,76 +67,10 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Письмо репетитору'),
         actions: [
-          context.watch<CriteriasBloc>().state.canUpdate
-              ? Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
-                  child: ElevatedButton(
-                      onPressed: () {
-                        context.read<CriteriasBloc>().add(UpdateCriterias());
-                      },
-                      child: const Text('Обновить списки')),
-                )
-              : Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
-                  child: context.watch<CriteriasBloc>().state.status ==
-                          Status.download
-                      ? const CircularProgressIndicator.adaptive()
-                      : ElevatedButton(
-                          onPressed: () {
-                            context
-                                .read<CriteriasBloc>()
-                                .add(FetchLocalCriterias());
-                          },
-                          child: const Text('Проверить обновления')),
-                ),
-          // ElevatedButton.icon(
-          //   label: Text('Настройки'),
-          //   onPressed: () {
-          //     showDialog(
-          //         context: context,
-          //         builder: (BuildContext context) {
-          //           return AlertDialog(
-          //             title: Text('Оформление ошибок и рекомендаций'),
-          //             content: SingleChildScrollView(
-          //                 child: Column(
-          //               children: [
-          //                 RadioListTile<int>(
-          //                     title: Text('Маркированный список'),
-          //                     value: 0,
-          //                     groupValue:
-          //                         context.watch<LetterBloc>().state.decoration,
-          //                     onChanged: (value) {
-          //                       context
-          //                           .read<LetterBloc>()
-          //                           .add(SetDecoration(decoration: value ?? 0));
-          //                     }),
-          //                 RadioListTile<int>(
-          //                     title: Text('Тире'),
-          //                     value: 1,
-          //                     groupValue:
-          //                         context.watch<LetterBloc>().state.decoration,
-          //                     onChanged: (value) {
-          //                       context
-          //                           .read<LetterBloc>()
-          //                           .add(SetDecoration(decoration: value ?? 0));
-          //                     }),
-          //                 RadioListTile<int>(
-          //                     title: Text('Отсутствует'),
-          //                     value: 2,
-          //                     groupValue:
-          //                         context.watch<LetterBloc>().state.decoration,
-          //                     onChanged: (value) {
-          //                       context
-          //                           .read<LetterBloc>()
-          //                           .add(SetDecoration(decoration: value ?? 0));
-          //                     }),
-          //               ],
-          //             )),
-          //           );
-          //         });
-          //   },
-          //   icon: const Icon(Icons.settings),
-          // )
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: _buildUpdateButton(),
+          ),
         ],
       ),
       body: Row(
@@ -121,16 +87,13 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: BlocBuilder<LetterBloc, LetterState>(
-                  builder: (context, state) {
-                return SingleChildScrollView(child: HtmlWidget(state.toHtml));
-              }),
+              child: _buildLetterPreview(),
             ),
-          )
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: copy,
+        onPressed: _copyToClipboard,
         tooltip: 'Copy',
         label: const Text('Копировать письмо'),
         icon: const Icon(Icons.copy),

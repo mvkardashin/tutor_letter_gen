@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tutor_letter_gen/models/criteria.dart';
-
+import 'package:tutor_letter_gen/models/issue.dart';
+import 'package:collection/collection.dart';
 import '/bloc/letter/letter_event.dart';
 import '/bloc/letter/letter_state.dart';
 
@@ -13,6 +14,7 @@ class LetterBloc extends Bloc<LetterEvent, LetterState> {
     on<AddInLetter>(_onAddInLetter);
     on<DeleteFromLetter>(_onDeleteFromLetter);
     on<CleanLetter>(_onCleanLetter);
+    on<AddinLetterFromIssues>(_onAddinLetterFromIssues);
     // on<SetDecoration>(_onSetDecoration);
     // on<FetchSettings>(_onFetchSettings);
   }
@@ -46,15 +48,26 @@ class LetterBloc extends Bloc<LetterEvent, LetterState> {
     emit(LetterState.init());
   }
 
-  // FutureOr<void> _onSetDecoration(
-  //     SetDecoration event, Emitter<LetterState> emit) {
-  //   emit(state.copyWith(decoration: event.decoration));
-  //   SP.setDecoration(event.decoration);
-  // }
-
-  // FutureOr<void> _onFetchSettings(
-  //     FetchSettings event, Emitter<LetterState> emit) async {
-  //   int decorationValue = await SP.getDecoration();
-  //   emit(state.copyWith(decoration: decorationValue));
-  // }
+  FutureOr<void> _onAddinLetterFromIssues(
+      AddinLetterFromIssues event, Emitter<LetterState> emit) {
+    for (Issue issue in event.issues) {
+      if (issue.isWarning) {
+        Criteria? error = event.errors
+            .firstWhereOrNull((element) => element.id == issue.excelId);
+        if (error != null) {
+          List<Criteria> errors = List.from(state.errors);
+          errors.add(error);
+          emit(state.copyWith(errors: errors));
+        }
+      } else {
+        Criteria? rec = event.recommendations
+            .firstWhereOrNull((element) => element.id == issue.excelId);
+        if (rec != null) {
+          List<Criteria> recs = List.from(state.recommendation);
+          recs.add(rec);
+          emit(state.copyWith(errors: recs));
+        }
+      }
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/models/criteria.dart';
@@ -12,6 +13,8 @@ import '/models/status.dart';
 import '/services/sp/sp_services.dart';
 
 class CriteriasBloc extends Bloc<CriteriasEvent, CriteriasState> {
+  final CriteriasRepository _criteriasRepository = CriteriasRepository();
+
   CriteriasBloc()
       : super(CriteriasState(
             status: Status.download,
@@ -23,20 +26,21 @@ class CriteriasBloc extends Bloc<CriteriasEvent, CriteriasState> {
     on<UpdateCriterias>(_onUpdate);
     on<FilterCriterias>(_onFilter);
   }
-  CriteriasRepository criteriasRepository = CriteriasRepository();
 
-  FutureOr<void> _onFetch(
+  Future<void> _onFetch(
       FetchLocalCriterias event, Emitter<CriteriasState> emit) async {
     emit(state.copyWith(status: Status.download));
-    String localCriterias = await criteriasRepository.fetchLocalCriterias();
+    String localCriterias = await _criteriasRepository.fetchLocalCriterias();
     String sheetsCriterias = '';
 
     if (localCriterias.isEmpty) {
+      debugPrint('localCriterias: ${localCriterias.isEmpty}');
       try {
-        sheetsCriterias = await criteriasRepository.fetchSheetsCriterias();
+        // sheetsCriterias = await _criteriasRepository.getSheetsCriterias();
+        debugPrint('sheetsCriterias: $sheetsCriterias');
         Criterias newCriterias =
-            criteriasRepository.decodeCriterias(sheetsCriterias);
-        SP.setCriterias(sheetsCriterias);
+            await _criteriasRepository.getSheetsCriterias();
+        await SP.setCriterias(sheetsCriterias);
         emit(state.copyWith(
             status: Status.loaded,
             criterias: newCriterias,
@@ -46,13 +50,13 @@ class CriteriasBloc extends Bloc<CriteriasEvent, CriteriasState> {
       }
     } else {
       Criterias newCriterias =
-          criteriasRepository.decodeCriterias(localCriterias);
+          _criteriasRepository.decodeCriterias(localCriterias);
       emit(state.copyWith(
           status: Status.loaded,
           criterias: newCriterias,
           filteredCriterias: newCriterias));
       try {
-        sheetsCriterias = await criteriasRepository.fetchSheetsCriterias();
+        sheetsCriterias = await _criteriasRepository.fetchSheetsCriterias();
         if (localCriterias != sheetsCriterias && sheetsCriterias.isNotEmpty) {
           emit(state.copyWith(
               status: Status.loaded,
@@ -65,11 +69,11 @@ class CriteriasBloc extends Bloc<CriteriasEvent, CriteriasState> {
     }
   }
 
-  FutureOr<void> _onUpdate(
+  Future<void> _onUpdate(
       UpdateCriterias event, Emitter<CriteriasState> emit) async {
     Criterias newCriterias =
-        criteriasRepository.decodeCriterias(state.fetchedCriterias);
-    SP.setCriterias(state.fetchedCriterias);
+        _criteriasRepository.decodeCriterias(state.fetchedCriterias);
+    await SP.setCriterias(state.fetchedCriterias);
     emit(state.copyWith(
         status: Status.loaded,
         criterias: newCriterias,
@@ -77,16 +81,15 @@ class CriteriasBloc extends Bloc<CriteriasEvent, CriteriasState> {
         canUpdate: false));
   }
 
-  FutureOr<void> _onFilter(
-      FilterCriterias event, Emitter<CriteriasState> emit) {
+  void _onFilter(FilterCriterias event, Emitter<CriteriasState> emit) {
     if (event.filter.isNotEmpty) {
       List<Criteria> errs = state.criterias.errors
-          .where(
-              (element) => element.reason.toLowerCase().contains(event.filter))
+          .where((element) =>
+              element.reason.toLowerCase().contains(event.filter.toLowerCase()))
           .toList();
       List<Criteria> recs = state.criterias.recs
-          .where(
-              (element) => element.reason.toLowerCase().contains(event.filter))
+          .where((element) =>
+              element.reason.toLowerCase().contains(event.filter.toLowerCase()))
           .toList();
       emit(state.copyWith(
           filteredCriterias: Criterias(errors: errs, recs: recs)));

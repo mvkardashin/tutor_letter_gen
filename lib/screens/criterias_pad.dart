@@ -17,6 +17,7 @@ class CriteriasPad extends StatelessWidget {
         Status.download => const CircularProgressIndicator.adaptive(),
         Status.loaded => const CriteriasList(),
         Status.error => const Text('Ошибка'),
+        Status.checkUpdate => const CircularProgressIndicator.adaptive(),
       };
     });
   }

@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:tutor_letter_gen/router/router.gr.dart';
+import 'package:tutor_letter_gen/screens/home_page.dart';
+import 'package:tutor_letter_gen/screens/%D1%81heck_teacher_page.dart';
 
 @RoutePage()
 class TabsPage extends StatelessWidget {
@@ -8,10 +10,12 @@ class TabsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // return TestPage();
     return AutoTabsRouter(
       routes: const [
+        CheckTeacherRoute(),
         HomeRoute(),
-        EmailAnswerRoute(),
+        // EmailAnswerRoute(),
       ],
       builder: (context, child) {
         final tabsRouter = AutoTabsRouter.of(context);
@@ -26,9 +30,10 @@ class TabsPage extends StatelessWidget {
             },
             items: const [
               BottomNavigationBarItem(
-                  label: 'По анкетам', icon: Icon(Icons.accessibility_sharp)),
+                  label: 'Пречек анкеты', icon: Icon(Icons.email_outlined)),
               BottomNavigationBarItem(
-                  label: 'Для почты', icon: Icon(Icons.email_outlined)),
+                  label: 'Генератор письма',
+                  icon: Icon(Icons.accessibility_sharp)),
             ],
           ),
         );

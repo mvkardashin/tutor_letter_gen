@@ -35,16 +35,4 @@ class EmailLetterBloc extends Bloc<EmailLetterEvent, EmailLetterState> {
       CleanEmailLetter event, Emitter<EmailLetterState> emit) {
     emit(EmailLetterState.init());
   }
-
-  // FutureOr<void> _onSetDecoration(
-  //     SetDecoration event, Emitter<LetterState> emit) {
-  //   emit(state.copyWith(decoration: event.decoration));
-  //   SP.setDecoration(event.decoration);
-  // }
-
-  // FutureOr<void> _onFetchSettings(
-  //     FetchSettings event, Emitter<LetterState> emit) async {
-  //   int decorationValue = await SP.getDecoration();
-  //   emit(state.copyWith(decoration: decorationValue));
-  // }
 }

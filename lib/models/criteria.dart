@@ -19,23 +19,26 @@ class Criteria {
     required this.id,
   });
 
-  Criteria copyWith(
-      {CriteriaType? type,
-      String? reason,
-      String? desc,
-      String? value,
-      String? html,
-      int? id}) {
+  Criteria copyWith({
+    CriteriaType? type,
+    String? reason,
+    String? desc,
+    String? value,
+    String? html,
+    int? id,
+  }) {
     return Criteria(
-        type: type ?? this.type,
-        reason: reason ?? this.reason,
-        desc: desc ?? this.desc,
-        value: value ?? this.value,
-        html: html ?? this.html,
-        id: id ?? this.id);
+      type: type ?? this.type,
+      reason: reason ?? this.reason,
+      desc: desc ?? this.desc,
+      value: value ?? this.value,
+      html: html ?? this.html,
+      id: id ?? this.id,
+    );
   }
 
   String get htmlLi => "<li>$html</li>";
+
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'type': type.toString(),
@@ -43,7 +46,7 @@ class Criteria {
       'desc': desc,
       'value': value,
       'html': html,
-      'id': id
+      'id': id,
     };
   }
 
@@ -71,13 +74,21 @@ class Criteria {
 
   String toJson() => json.encode(toMap());
 
-  factory Criteria.errorfromJson(String source) =>
-      Criteria.error(json.decode(source) as Map<String, dynamic>);
-  factory Criteria.recfromJson(String source) =>
-      Criteria.rec(json.decode(source) as Map<String, dynamic>);
+  factory Criteria.errorfromJson(String source) {
+    final Map<String, dynamic> json =
+        jsonDecode(source) as Map<String, dynamic>;
+    return Criteria.error(json);
+  }
+
+  factory Criteria.recfromJson(String source) {
+    final Map<String, dynamic> json =
+        jsonDecode(source) as Map<String, dynamic>;
+    return Criteria.rec(json);
+  }
+
   @override
   String toString() {
-    return 'Criteria(type: $type, reason: $reason, desc: $desc, value: $value,html: $html,id: $id)';
+    return 'Criteria(type: $type, reason: $reason, desc: $desc, value: $value, html: $html, id: $id)';
   }
 
   @override
