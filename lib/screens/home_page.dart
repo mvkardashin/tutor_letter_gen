@@ -2,11 +2,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:rich_clipboard/rich_clipboard.dart';
 import '/bloc/criterias/criterias_event.dart';
 import '/bloc/letter/letter_bloc.dart';
 import '/models/status.dart';
 import '/screens/criterias_pad.dart';
+import '/services/clipboard_service.dart';
 
 import '../bloc/criterias/criterias_bloc.dart';
 import '../bloc/letter/letter_state.dart';
@@ -22,10 +22,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  void copy() async {
-    await RichClipboard.setData(RichClipboardData(
-        text: context.read<LetterBloc>().state.toText,
-        html: context.read<LetterBloc>().state.toHtml));
+  Future<void> copy() async {
+    final letter = context.read<LetterBloc>().state;
+    final result = await ClipboardService.copy(
+      text: letter.toText,
+      html: letter.toHtml,
+    );
+    if (!mounted) return;
+
+    final message = switch (result) {
+      ClipboardCopyResult.richText => 'Письмо скопировано',
+      ClipboardCopyResult.plainText => 'Письмо скопировано как обычный текст',
+      ClipboardCopyResult.failed =>
+        'Не удалось скопировать. Выделите текст и нажмите Ctrl+C.',
+    };
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -123,7 +135,11 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(8.0),
               child: BlocBuilder<LetterBloc, LetterState>(
                   builder: (context, state) {
-                return SingleChildScrollView(child: HtmlWidget(state.toHtml));
+                return SelectionArea(
+                  child: SingleChildScrollView(
+                    child: HtmlWidget(state.toHtml),
+                  ),
+                );
               }),
             ),
           )

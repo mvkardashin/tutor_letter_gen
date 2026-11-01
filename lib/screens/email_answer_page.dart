@@ -2,14 +2,13 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:rich_clipboard/rich_clipboard.dart';
 import 'package:tutor_letter_gen/bloc/email_letter/email_letter_bloc.dart';
 import 'package:tutor_letter_gen/bloc/email_letter/email_letter_state.dart';
 import '/bloc/email_answers/email_answers_bloc.dart';
 import '/bloc/email_answers/email_answers_event.dart';
 import '/screens/email_answers_pad.dart';
-import '/bloc/letter/letter_bloc.dart';
 import '/models/status.dart';
+import '/services/clipboard_service.dart';
 
 @RoutePage()
 class EmailAnswerPage extends StatefulWidget {
@@ -22,10 +21,22 @@ class EmailAnswerPage extends StatefulWidget {
 }
 
 class _EmailAnswerPageState extends State<EmailAnswerPage> {
-  void copy() async {
-    await RichClipboard.setData(RichClipboardData(
-        text: context.read<LetterBloc>().state.toText,
-        html: context.read<LetterBloc>().state.toHtml));
+  Future<void> copy() async {
+    final letter = context.read<EmailLetterBloc>().state;
+    final result = await ClipboardService.copy(
+      text: letter.toText,
+      html: letter.toHtml,
+    );
+    if (!mounted) return;
+
+    final message = switch (result) {
+      ClipboardCopyResult.richText => 'Ответ скопирован',
+      ClipboardCopyResult.plainText => 'Ответ скопирован как обычный текст',
+      ClipboardCopyResult.failed =>
+        'Не удалось скопировать. Выделите текст и нажмите Ctrl+C.',
+    };
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -77,7 +88,11 @@ class _EmailAnswerPageState extends State<EmailAnswerPage> {
               padding: const EdgeInsets.all(8.0),
               child: BlocBuilder<EmailLetterBloc, EmailLetterState>(
                   builder: (context, state) {
-                return SingleChildScrollView(child: HtmlWidget(state.toHtml));
+                return SelectionArea(
+                  child: SingleChildScrollView(
+                    child: HtmlWidget(state.toHtml),
+                  ),
+                );
               }),
             ),
           )
