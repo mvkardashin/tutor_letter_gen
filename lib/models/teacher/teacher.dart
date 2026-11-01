@@ -1,5 +1,5 @@
 import 'package:intl/intl.dart';
-import 'package:tutor_letter_gen/models/issue.dart';
+import 'package:tutor_letter_gen/models/teacher/teacher_surcharge.dart';
 
 import 'package:tutor_letter_gen/services/values.dart';
 import '/models/teacher/teacher_group.dart';
@@ -18,7 +18,7 @@ class Teacher {
   final int id; // ID;
   final String repetitor; // Описание репетитора;
   final String photoSmall; // Размер изображения не более 250 пк;
-
+  final List<TeacherSurcharge> surcharges;
   final String url; // URL анкеты;
   final String userFullname; // ФИО преподавателя;
 
@@ -77,6 +77,7 @@ class Teacher {
       required this.areaDeparture,
       required this.areaLocal,
       required this.metroDeparture,
+      required this.surcharges,
       required this.metroLocal,
       required this.educations,
       required this.experience,
@@ -91,28 +92,43 @@ class Teacher {
       required this.groupReasons,
       required this.groups});
 
-  factory Teacher.fromJSON(Map teacher) {
-    List<int> arrayCategories = [];
-    List<int> positions = [];
-    arrayCategories = teacher['categories']?.isNotEmpty
-        ? List<int>.from(teacher['categories'].map((e) => e['id']).toList())
-        : [];
-    positions = teacher['positions']?.isNotEmpty
-        ? List<int>.from(teacher['positions'].map((e) => e['id']).toList())
-        : [];
-    List<TeacherGroup> groups = teacher['groups']?.isNotEmpty
-        ? List<TeacherGroup>.from(
-                teacher['groups'].map((e) => TeacherGroup.fromJson(e)).toList())
+  factory Teacher.fromJSON(Map<String, dynamic> teacher) {
+    // категории
+    final categories = (teacher['categories'] is List)
+        ? (teacher['categories'] as List)
+            .map((e) => (e['id'] as num?)?.toInt() ?? 0)
+            .toList()
+        : <int>[];
+
+    final surcharges = (teacher['teacher-category'] is List)
+        ? (teacher['teacher-category'] as List)
+            .map((e) => TeacherSurcharge.fromMap(e))
+            .toList()
+        : <TeacherSurcharge>[];
+
+    // позиции
+    final positions = (teacher['positions'] is List)
+        ? (teacher['positions'] as List)
+            .map((e) => (e['id'] as num?)?.toInt() ?? 0)
+            .toList()
+        : <int>[];
+
+    // группы
+    final groups = (teacher['groups'] is List)
+        ? (teacher['groups'] as List)
+            .map((e) => TeacherGroup.fromJson(e))
             .where((e) => e.statusId != 50 && e.statusId != 40)
             .toList()
-        : [];
+        : <TeacherGroup>[];
 
-    List<TeacherLesson> localLessons = [];
-    List<TeacherLesson> departureLessons = [];
-    List<TeacherLesson> remoteLessons = [];
-    if (teacher['lessons'].isNotEmpty) {
-      for (Map<String, dynamic> element in teacher['lessons']) {
-        TeacherLesson lesson = TeacherLesson.fromMap(element);
+    // уроки
+    final localLessons = <TeacherLesson>[];
+    final departureLessons = <TeacherLesson>[];
+    final remoteLessons = <TeacherLesson>[];
+
+    if (teacher['lessons'] is List) {
+      for (final element in teacher['lessons'] as List) {
+        final lesson = TeacherLesson.fromMap(element);
         switch (lesson.place) {
           case 1:
             localLessons.add(lesson);
@@ -127,111 +143,273 @@ class Teacher {
       }
     }
 
-    // Районы занятий у репетитора;
-    List<int> areaLocal = teacher['area-local']?.isNotEmpty
-        ? List<int>.from(teacher['area-local'].map((e) => e['id']).toList())
-        : [];
+    // районы занятий у репетитора
+    final areaLocal = (teacher['area-local'] is List)
+        ? (teacher['area-local'] as List)
+            .map((e) => (e['id'] as num?)?.toInt() ?? 0)
+            .toList()
+        : <int>[];
 
-    // Районы занятий у ученика;
-    List<int> areaDeparture = teacher['area-departure']?.isNotEmpty
-        ? List<int>.from(teacher['area-departure'].map((e) => e['id']).toList())
-        : [];
+    // районы занятий у ученика
+    final areaDeparture = (teacher['area-departure'] is List)
+        ? (teacher['area-departure'] as List)
+            .map((e) => (e['id'] as num?)?.toInt() ?? 0)
+            .toList()
+        : <int>[];
 
-    // Метро занятий у репетитора;
-    List<int> metroLocal = teacher['metro-local']?.isNotEmpty
-        ? List<int>.from(teacher['metro-local'].map((e) => e['id']).toList())
-        : [];
+    // метро у репетитора
+    final metroLocal = (teacher['metro-local'] is List)
+        ? (teacher['metro-local'] as List)
+            .map((e) => (e['id'] as num?)?.toInt() ?? 0)
+            .toList()
+        : <int>[];
 
-    List<int> metroDeparture = teacher['metro-departure']?.isNotEmpty
-        ? List<int>.from(
-            teacher['metro-departure'].map((e) => e['id']).toList())
-        : [];
+    // метро у ученика
+    final metroDeparture = (teacher['metro-departure'] is List)
+        ? (teacher['metro-departure'] as List)
+            .map((e) => (e['id'] as num?)?.toInt() ?? 0)
+            .toList()
+        : <int>[];
 
-    List<TeacherEducation> educations = teacher['educations']?.isNotEmpty
-        ? List<TeacherEducation>.from(teacher['educations']
+    // образование
+    final educations = (teacher['educations'] is List)
+        ? (teacher['educations'] as List)
             .map((e) => TeacherEducation.fromMap(e))
-            .toList())
-        : [];
+            .toList()
+        : <TeacherEducation>[];
 
-    List<TeacherExperience> experience = teacher['experience']?.isNotEmpty
-        ? List<TeacherExperience>.from(teacher['experience']
+    // опыт
+    final experience = (teacher['experience'] is List)
+        ? (teacher['experience'] as List)
             .map((e) => TeacherExperience.fromMap(e))
-            .toList())
-        : [];
+            .toList()
+        : <TeacherExperience>[];
 
-    List<TeacherDegree> degree = teacher['degree']?.isNotEmpty
-        ? List<TeacherDegree>.from(
-            teacher['degree']?.map((e) => TeacherDegree.fromMap(e)).toList())
-        : [];
+    // степени
+    final degree = (teacher['degree'] is List)
+        ? (teacher['degree'] as List)
+            .map((e) => TeacherDegree.fromMap(e))
+            .toList()
+        : <TeacherDegree>[];
 
-    // List rank = [];
+    // звания
+    final rank = (teacher['rank'] is List)
+        ? (teacher['rank'] as List).map((e) => TeacherRank.fromMap(e)).toList()
+        : <TeacherRank>[];
 
-    // if (teacher['rank'].isNotEmpty) {
-    List<TeacherRank> rank = teacher['rank']?.isNotEmpty
-        ? List<TeacherRank>.from(
-            teacher['rank'].map((e) => TeacherRank.fromMap(e)).toList())
-        : [];
+    // награды
+    final honor = (teacher['honor'] is List)
+        ? (teacher['honor'] as List)
+            .map((e) => TeacherHonor.fromMap(e))
+            .toList()
+        : <TeacherHonor>[];
 
-    // List honor = [];
+    // доп. достижения
+    final advance = (teacher['advance'] is List)
+        ? (teacher['advance'] as List)
+            .map((e) => TeacherAdvance.fromMap(e))
+            .toList()
+        : <TeacherAdvance>[];
 
-    List<TeacherHonor> honor = teacher['honor']?.isNotEmpty
-        ? List<TeacherHonor>.from(
-            teacher['honor'].map((e) => TeacherHonor.fromMap(e)).toList())
-        : [];
+    // объединённый список
+    final fullAdvance = [...advance, ...honor];
 
-    List<TeacherAdvance> advance = teacher['advance']?.isNotEmpty
-        ? List<TeacherAdvance>.from(
-            teacher['advance'].map((e) => TeacherAdvance.fromMap(e)).toList())
-        : [];
+    // акции
+    final actions = (teacher['actions'] is List)
+        ? (teacher['actions'] as List)
+            .map((e) => e['value'] as String? ?? '')
+            .where((s) => s.isNotEmpty)
+            .toList()
+        : <String>[];
 
-    List<TeacherItem> fullAdvance = [...advance, ...honor];
-
-    List<String> actions = teacher['actions']?.isNotEmpty
-        ? List<String>.from(
-            teacher['actions'].map((e) => e['value'] ?? '').toList())
-        : [];
-    List<String> groupReasons = teacher['group_reasons']?.isNotEmpty
-        ? List<String>.from(
-            teacher['group_reasons'].map((e) => e ?? '').toList())
-        : [];
-    // debugPrint(teacher['group_reasons']);
+    // причины группы
+    final groupReasons = (teacher['group_reasons'] is List)
+        ? (teacher['group_reasons'] as List)
+            .map((e) => e as String? ?? '')
+            .where((s) => s.isNotEmpty)
+            .toList()
+        : <String>[];
 
     return Teacher(
-        id: teacher['id']?.toInt() ?? 0,
-        url: teacher['url'] ?? '',
-        repetitor: teacher['repetitor'] ?? '',
-        photoSmall: teacher['photo']?['small'] ?? '',
-        userFullname: teacher['user']?['fullname'] ?? 'Нет информации',
-        statusId: teacher['status']?['id']?.toInt() ?? 0,
-        subjectId: teacher['subject']?['id']?.toInt() ?? 0,
-        categories: arrayCategories,
-        positions: positions,
-        workPretty: teacher['work-pretty'] ?? 'Нет информации о стаже',
-        locationId: teacher['location']?['id']?.toInt() ?? 0,
-        localLessons: localLessons,
-        departureLessons: departureLessons,
-        remoteLessons: remoteLessons,
-        timeDeparturePretty: teacher['time-departure-pretty'] ?? '',
-        timeLocalPretty: teacher['time-local-pretty'] ?? '',
-        timeRemotePretty: teacher['time-remote-pretty'] ?? '',
-        areaDeparture: areaDeparture,
-        areaLocal: areaLocal,
-        metroLocal: metroLocal,
-        metroDeparture: metroDeparture,
-        educations: educations,
-        experience: experience,
-        degree: degree,
-        rank: rank,
-        honor: honor,
-        advance: fullAdvance,
-        text: teacher['text'] ?? '',
-        video: teacher['video']?['code'] ?? '',
-        actions: actions,
-        lastReturnText: teacher['lastReturnText'] ?? '',
-        groupAvailabled: teacher['group_availabled'] ?? false,
-        groupReasons: groupReasons,
-        groups: groups);
+      id: (teacher['id'] as num?)?.toInt() ?? 0,
+      url: teacher['url'] as String? ?? '',
+      repetitor: teacher['repetitor'] as String? ?? '',
+      photoSmall: teacher['photo']?['small'] as String? ?? '',
+      userFullname: teacher['user']?['fullname'] as String? ?? 'Нет информации',
+      statusId: (teacher['status']?['id'] as num?)?.toInt() ?? 0,
+      subjectId: (teacher['subject']?['id'] as num?)?.toInt() ?? 0,
+      categories: categories,
+      surcharges: surcharges,
+      positions: positions,
+      workPretty: teacher['work-pretty'] as String? ?? 'Нет информации о стаже',
+      locationId: (teacher['location']?['id'] as num?)?.toInt() ?? 0,
+      localLessons: localLessons,
+      departureLessons: departureLessons,
+      remoteLessons: remoteLessons,
+      timeDeparturePretty: teacher['time-departure-pretty'] as String? ?? '',
+      timeLocalPretty: teacher['time-local-pretty'] as String? ?? '',
+      timeRemotePretty: teacher['time-remote-pretty'] as String? ?? '',
+      areaDeparture: areaDeparture,
+      areaLocal: areaLocal,
+      metroLocal: metroLocal,
+      metroDeparture: metroDeparture,
+      educations: educations,
+      experience: experience,
+      degree: degree,
+      rank: rank,
+      honor: honor,
+      advance: fullAdvance,
+      text: teacher['text'] as String? ?? '',
+      video: teacher['video']?['code'] as String? ?? '',
+      actions: actions,
+      lastReturnText: teacher['lastReturnText'] as String? ?? '',
+      groupAvailabled: teacher['group_availabled'] as bool? ?? false,
+      groupReasons: groupReasons,
+      groups: groups,
+    );
   }
+
+  // factory Teacher.fromJSON(Map teacher) {
+  //   List<int> arrayCategories = [];
+  //   List<int> positions = [];
+  //   arrayCategories = teacher['categories']?.isNotEmpty
+  //       ? List<int>.from(teacher['categories'].map((e) => e['id']).toList())
+  //       : [];
+  //   positions = teacher['positions']?.isNotEmpty
+  //       ? List<int>.from(teacher['positions'].map((e) => e['id']).toList())
+  //       : [];
+  //   List<TeacherGroup> groups = teacher['groups']?.isNotEmpty
+  //       ? List<TeacherGroup>.from(
+  //               teacher['groups'].map((e) => TeacherGroup.fromJson(e)).toList())
+  //           .where((e) => e.statusId != 50 && e.statusId != 40)
+  //           .toList()
+  //       : [];
+
+  //   List<TeacherLesson> localLessons = [];
+  //   List<TeacherLesson> departureLessons = [];
+  //   List<TeacherLesson> remoteLessons = [];
+  //   if (teacher['lessons'].isNotEmpty) {
+  //     for (Map<String, dynamic> element in teacher['lessons']) {
+  //       TeacherLesson lesson = TeacherLesson.fromMap(element);
+  //       switch (lesson.place) {
+  //         case 1:
+  //           localLessons.add(lesson);
+  //           break;
+  //         case 2:
+  //           departureLessons.add(lesson);
+  //           break;
+  //         case 3:
+  //           remoteLessons.add(lesson);
+  //           break;
+  //       }
+  //     }
+  //   }
+
+  //   // Районы занятий у репетитора;
+  //   List<int> areaLocal = teacher['area-local']?.isNotEmpty
+  //       ? List<int>.from(teacher['area-local'].map((e) => e['id']).toList())
+  //       : [];
+
+  //   // Районы занятий у ученика;
+  //   List<int> areaDeparture = teacher['area-departure']?.isNotEmpty
+  //       ? List<int>.from(teacher['area-departure'].map((e) => e['id']).toList())
+  //       : [];
+
+  //   // Метро занятий у репетитора;
+  //   List<int> metroLocal = teacher['metro-local']?.isNotEmpty
+  //       ? List<int>.from(teacher['metro-local'].map((e) => e['id']).toList())
+  //       : [];
+
+  //   List<int> metroDeparture = teacher['metro-departure']?.isNotEmpty
+  //       ? List<int>.from(
+  //           teacher['metro-departure'].map((e) => e['id']).toList())
+  //       : [];
+
+  //   List<TeacherEducation> educations = teacher['educations']?.isNotEmpty
+  //       ? List<TeacherEducation>.from(teacher['educations']
+  //           .map((e) => TeacherEducation.fromMap(e))
+  //           .toList())
+  //       : [];
+
+  //   List<TeacherExperience> experience = teacher['experience']?.isNotEmpty
+  //       ? List<TeacherExperience>.from(teacher['experience']
+  //           .map((e) => TeacherExperience.fromMap(e))
+  //           .toList())
+  //       : [];
+
+  //   List<TeacherDegree> degree = teacher['degree']?.isNotEmpty
+  //       ? List<TeacherDegree>.from(
+  //           teacher['degree']?.map((e) => TeacherDegree.fromMap(e)).toList())
+  //       : [];
+
+  //   // List rank = [];
+
+  //   // if (teacher['rank'].isNotEmpty) {
+  //   List<TeacherRank> rank = teacher['rank']?.isNotEmpty
+  //       ? List<TeacherRank>.from(
+  //           teacher['rank'].map((e) => TeacherRank.fromMap(e)).toList())
+  //       : [];
+
+  //   // List honor = [];
+
+  //   List<TeacherHonor> honor = teacher['honor']?.isNotEmpty
+  //       ? List<TeacherHonor>.from(
+  //           teacher['honor'].map((e) => TeacherHonor.fromMap(e)).toList())
+  //       : [];
+
+  //   List<TeacherAdvance> advance = teacher['advance']?.isNotEmpty
+  //       ? List<TeacherAdvance>.from(
+  //           teacher['advance'].map((e) => TeacherAdvance.fromMap(e)).toList())
+  //       : [];
+
+  //   List<TeacherItem> fullAdvance = [...advance, ...honor];
+
+  //   List<String> actions = teacher['actions']?.isNotEmpty
+  //       ? List<String>.from(
+  //           teacher['actions'].map((e) => e['value'] ?? '').toList())
+  //       : [];
+  //   List<String> groupReasons = teacher['group_reasons']?.isNotEmpty
+  //       ? List<String>.from(
+  //           teacher['group_reasons'].map((e) => e ?? '').toList())
+  //       : [];
+  //   // debugPrint(teacher['group_reasons']);
+
+  //   return Teacher(
+  //       id: teacher['id']?.toInt() ?? 0,
+  //       url: teacher['url'] ?? '',
+  //       repetitor: teacher['repetitor'] ?? '',
+  //       photoSmall: teacher['photo']?['small'] ?? '',
+  //       userFullname: teacher['user']?['fullname'] ?? 'Нет информации',
+  //       statusId: teacher['status']?['id']?.toInt() ?? 0,
+  //       subjectId: teacher['subject']?['id']?.toInt() ?? 0,
+  //       categories: arrayCategories,
+  //       positions: positions,
+  //       workPretty: teacher['work-pretty'] ?? 'Нет информации о стаже',
+  //       locationId: teacher['location']?['id']?.toInt() ?? 0,
+  //       localLessons: localLessons,
+  //       departureLessons: departureLessons,
+  //       remoteLessons: remoteLessons,
+  //       timeDeparturePretty: teacher['time-departure-pretty'] ?? '',
+  //       timeLocalPretty: teacher['time-local-pretty'] ?? '',
+  //       timeRemotePretty: teacher['time-remote-pretty'] ?? '',
+  //       areaDeparture: areaDeparture,
+  //       areaLocal: areaLocal,
+  //       metroLocal: metroLocal,
+  //       metroDeparture: metroDeparture,
+  //       educations: educations,
+  //       experience: experience,
+  //       degree: degree,
+  //       rank: rank,
+  //       honor: honor,
+  //       advance: fullAdvance,
+  //       text: teacher['text'] ?? '',
+  //       video: teacher['video']?['code'] ?? '',
+  //       actions: actions,
+  //       lastReturnText: teacher['lastReturnText'] ?? '',
+  //       groupAvailabled: teacher['group_availabled'] ?? false,
+  //       groupReasons: groupReasons,
+  //       groups: groups);
+  // }
 
   Teacher copyWith(
       {int? id,
@@ -258,6 +436,7 @@ class Teacher {
       List<TeacherRank>? rank,
       List<TeacherHonor>? honor,
       List<TeacherAdvance>? advance,
+      List<TeacherSurcharge>? surcharges,
       String? text,
       String? video,
       List<String>? actions,
@@ -275,6 +454,7 @@ class Teacher {
         url: url ?? this.url,
         userFullname: userFullname ?? this.userFullname,
         statusId: statusId ?? this.statusId,
+        surcharges: surcharges ?? this.surcharges,
         subjectId: subjectId ?? this.subjectId,
         categories: categories ?? this.categories,
         positions: positions ?? this.positions,
@@ -338,6 +518,17 @@ class Teacher {
           .trimRight()
       : 'Не заполнено';
 
+  List<String> get prettySurcharges {
+    final List<String> res = [];
+    for (final TeacherSurcharge s in surcharges) {
+      final String name = subjects[s.subjectId] ?? '';
+      String str = "\nКатегория: $name, надбавка: ${s.cost} руб.";
+      res.add(str);
+    }
+
+    return res;
+  }
+
   bool get isOnCheck => statusId == 20;
   bool get isReturn => statusId == 15;
 
@@ -396,6 +587,10 @@ class Teacher {
         .toList();
   }
 
+  String get lessonPricesOnly {
+    return "Цены занятий репетитора:\n${alllessons.map((e) => "\n${e.cost} р").join('\n')}";
+  }
+
   bool get hasOffline {
     return alllessons.any((l) => l.place == 1 || l.place == 2);
   }
@@ -441,25 +636,20 @@ class Teacher {
     392,
   ];
 
-  Issue? get egeIssue {
+  String? get egeIssue {
     if (!hasEgeCategory) {
       return null; // правило не применимо
     }
     if (!hasAgeId4) {
-      return Issue(
-          code: "AGE_MISSING_FOR_EGE",
-          excelId: 290,
-          isWarning: true,
-          prompt:
-              '''Добавлена категория предмета Подготовка к ЕГЭ, но в разделе Цены занятий нет возрастной категории Школьники с 10 по 11 класс. При этом в анкете есть другие предложения, по которым вопросов нет.''');
+      return "AGE_MISSING_FOR_EGE";
     }
     return null;
   }
 
-  Issue? get checkEmptyGeo {
+  String? get checkEmptyGeo {
     bool hasLocalLesson = false;
     bool hasDepartureLesson = false;
-    Issue? issue;
+    String? issue;
 
     for (final lesson in alllessons) {
       if (lesson.place == 1) {
@@ -473,23 +663,13 @@ class Teacher {
     }
 
     if (hasLocalLesson && areaLocalCount == 0 && metroLocalCount == 0) {
-      issue = Issue(
-          code: "EMPTY_GEO",
-          excelId: 120,
-          isWarning: true,
-          prompt:
-              '''В анкете не указаны места (станции метро/районы) для очных форматов занятий в разделе Места занятий''');
+      issue = "EMPTY_GEO";
     }
 
     if (hasDepartureLesson &&
         areaDepartureCount == 0 &&
         metroDepartureCount == 0) {
-      issue = Issue(
-          code: "EMPTY_GEO",
-          excelId: 120,
-          isWarning: true,
-          prompt:
-              '''В анкете не указаны места (станции метро/районы) для очных форматов занятий в разделе Места занятий''');
+      issue = "EMPTY_GEO";
     }
     return issue;
   }
@@ -507,13 +687,8 @@ class Teacher {
     "el": RegExp(r"[Ά-ώΑ-ω]"), // греческий
   };
 
-  Issue? get checkFullname => userFullname.split(' ').length < 3
-      ? Issue(
-          code: "INCOMPLETE_FULL_NAME",
-          excelId: 20,
-          isWarning: true,
-          prompt: '''ФИО внесено не полностью''')
-      : null;
+  String? get checkFullname =>
+      userFullname.split(' ').length < 3 ? "INCOMPLETE_FULL_NAME" : null;
 
   double _scriptRatio(String text, RegExp pattern) {
     if (text.isEmpty) return 0.0;
@@ -554,27 +729,18 @@ class Teacher {
     return "unknown";
   }
 
-  Issue? get codeForeignLanguageAbout {
+  String? get codeForeignLanguageAbout {
     final detected = _detectTextLanguage(text);
     if (detected != "ru") {
-      return Issue(
-          code: "FOREIGN_LANGUAGE_ABOUT",
-          excelId: 270,
-          isWarning: true,
-          prompt: '''Текст в разделе О себе на иностранном языке.''');
+      return "FOREIGN_LANGUAGE_ABOUT";
     }
     return null;
   }
 
-  Issue? get checkLocalGeo {
+  String? get checkLocalGeo {
     final locals = areaLocalCount + metroLocalCount;
     if (locals > 10) {
-      return Issue(
-          code: "TOO_MANY_LOCAL_GEO",
-          isWarning: true,
-          excelId: 130,
-          prompt:
-              '''В разделе Места занятий указано нереально много точек геолокации для очных занятий у преподавателя (например, все станции метро, МЦК и Диаметров Большой Москвы).''');
+      return "TOO_MANY_LOCAL_GEO";
     }
     return null;
   }
@@ -619,7 +785,7 @@ class Teacher {
     return alllessons.any((lesson) => lesson.age == 3);
   }
 
-  Issue? get checkOgeAgeRequire {
+  String? get checkOgeAgeRequire {
     /// Правило:
     /// Если есть категория "Подготовка к ОГЭ",
     /// то должен быть возраст "Школьники с 5 по 9 класс" (id=3).
@@ -629,27 +795,17 @@ class Teacher {
 
     final ok = _hasOgeAgeId;
     if (!ok) {
-      return Issue(
-          code: "AGE_MISSING_FOR_OGE",
-          excelId: 300,
-          isWarning: true,
-          prompt:
-              '''Добавлена категория предмета Подготовка к ОГЭ, но в разделе Цены занятий нет возрастной категории Школьники с 5 по 9 класс. При этом в анкете есть другие предложения, по которым вопросов нет.''');
+      return "AGE_MISSING_FOR_OGE";
     }
 
     return null;
   }
 
-  Issue? get checkMinPrice {
+  String? get checkMinPrice {
     // Правило:
     // Если цена ниже 800 рублей → возвращаем проблему
     if (alllessons.any((lesson) => lesson.cost < 800)) {
-      return Issue(
-          code: "PRICE_TOO_LOW",
-          excelId: 70,
-          isWarning: true,
-          prompt:
-              '''В разделе Цены занятий указана стоимость занятия ниже 800 рублей''');
+      return "PRICE_TOO_LOW";
     }
     return null;
   }
@@ -718,17 +874,12 @@ class Teacher {
     return hasDeparture || hasAtTutor;
   }
 
-  Issue? get checkOnlineVsInPersonConflict {
+  String? get checkOnlineVsInPersonConflict {
     final textFlag = textClaimsOnlineOnly;
     final priceFlag = hasInPersonInPrices;
 
     if (textFlag && priceFlag) {
-      return Issue(
-          code: "ONLINE_ONLY_TEXT_CONFLICTS_WITH_IN_PERSON_PRICES",
-          isWarning: true,
-          prompt:
-              '''В разделе О себе репетитор пишет, что занимается только дистанционно, но в разделе Цены занятий указаны очные форматы занятий С выездом/У преподавателя''',
-          excelId: 90);
+      return "ONLINE_ONLY_TEXT_CONFLICTS_WITH_IN_PERSON_PRICES";
     }
 
     return null;

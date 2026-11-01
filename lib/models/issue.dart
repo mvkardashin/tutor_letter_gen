@@ -1,7 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-// import 'package:tutor_letter_gen/data/aiIssues.dart';
-import 'package:tutor_letter_gen/data/ai_issues.dart';
-
 class Issue {
   final String code;
 
@@ -24,14 +20,6 @@ class Issue {
       isWarning: json['is_warning'] as bool,
       prompt: json['prompt'] as String,
     );
-  }
-
-  factory Issue.fromCode(String code) {
-    final Issue issue = aiIssues.firstWhere(
-      (element) => element.code == code,
-      orElse: () => throw Exception('Issue with code $code not found'),
-    );
-    return issue;
   }
 
   Map<String, dynamic> toJson() {

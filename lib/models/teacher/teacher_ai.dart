@@ -13,6 +13,7 @@ class TeacherAI {
   final String categories; // Категории предмета;
   final String positions; // Статус преподавателя;
   final String lessonsPretty;
+  final String surcharges;
   final String
       timeLocalPretty; // Допустимые часы занятий у репетитора в HTML-формате;
   final String
@@ -37,6 +38,7 @@ class TeacherAI {
     return TeacherAI(
         id: teacher.id,
         repetitor: teacher.repetitor,
+        surcharges: teacher.prettySurcharges.join('; '),
         photoSmall: teacher.photoSmall,
         url: teacher.url,
         userFullname: teacher.userFullname,
@@ -67,6 +69,7 @@ class TeacherAI {
       {required this.id,
       required this.repetitor,
       required this.photoSmall,
+      required this.surcharges,
       required this.url,
       required this.userFullname,
       required this.subject,
@@ -90,35 +93,34 @@ class TeacherAI {
       required this.actions,
       required this.groups});
 
-  @override
-  @override
-  String toString() {
-    return 'TeacherAI('
-        'id: $id,\n'
-        'repetitor: $repetitor,\n'
-        'photoSmall: $photoSmall,\n'
-        'url: $url,\n'
-        'userFullname: $userFullname,\n'
-        'subject: $subject,\n'
-        'categories: $categories,\n'
-        'positions: $positions,\n'
-        'lessonsPretty: $lessonsPretty,\n'
-        'timeLocalPretty: $timeLocalPretty,\n'
-        'timeDeparturePretty: $timeDeparturePretty,\n'
-        'timeRemotePretty: $timeRemotePretty,\n'
-        'areaLocalCount: $areaLocalCount,\n'
-        'areaDepartureCount: $areaDepartureCount,\n'
-        'metroLocalCount: $metroLocalCount,\n'
-        'metroDepartureCount: $metroDepartureCount,\n'
-        'educations: $educations,\n'
-        'experience: $experience,\n'
-        'degree: $degree,\n'
-        'rank: $rank,\n'
-        'honor: $honor,\n'
-        'advance: $advance,\n'
-        'text: $text,\n'
-        'actions: $actions,\n'
-        'groups: $groups'
-        ')';
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'repetitor': repetitor,
+      'photoSmall': photoSmall,
+      'surcharges': surcharges,
+      'url': url,
+      'userFullname': userFullname,
+      'subject': subject,
+      'categories': categories,
+      'positions': positions,
+      'lessonsPretty': lessonsPretty,
+      'timeLocalPretty': timeLocalPretty,
+      'timeDeparturePretty': timeDeparturePretty,
+      'timeRemotePretty': timeRemotePretty,
+      'areaLocalCount': areaLocalCount,
+      'areaDepartureCount': areaDepartureCount,
+      'metroLocalCount': metroLocalCount,
+      'metroDepartureCount': metroDepartureCount,
+      'educations': educations,
+      'experience': experience,
+      'degree': degree,
+      'rank': rank,
+      'honor': honor,
+      'advance': advance,
+      'text': text,
+      'actions': actions,
+      'groups': groups,
+    };
   }
 }

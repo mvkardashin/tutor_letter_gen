@@ -5,22 +5,22 @@ import 'package:tutor_letter_gen/models/criteria.dart';
 
 // ignore: must_be_immutable
 class CriteriaComponent extends StatelessWidget {
-  final List<Criteria> list;
+  final bool isSelected;
   final Criteria element;
   final Function onAdd;
   final Function onDelete;
   const CriteriaComponent({
     super.key,
-    required this.list,
     required this.element,
     required this.onAdd,
     required this.onDelete,
+    required this.isSelected,
   });
 
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
-        value: list.contains(element),
+        value: isSelected,
         title: Row(
           children: [
             Expanded(child: Text(element.reason)),

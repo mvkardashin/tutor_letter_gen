@@ -1,8 +1,9 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:rich_clipboard/rich_clipboard.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+
 import '/bloc/criterias/criterias_event.dart';
 import '/bloc/letter/letter_bloc.dart';
 import '/models/status.dart';
@@ -21,10 +22,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Future<void> _copyToClipboard() async {
     final letterState = context.read<LetterBloc>().state;
-    await RichClipboard.setData(RichClipboardData(
+    await FlutterClipboard.copyRichText(
       text: letterState.toText,
       html: letterState.toHtml,
-    ));
+    );
   }
 
   Widget _buildUpdateButton() {
@@ -54,7 +55,10 @@ class _HomePageState extends State<HomePage> {
     return BlocBuilder<LetterBloc, LetterState>(
       builder: (context, state) {
         return SingleChildScrollView(
-          child: HtmlWidget(state.toHtml),
+          child: SelectionArea(
+              child: HtmlWidget(
+            state.toHtml,
+          )),
         );
       },
     );

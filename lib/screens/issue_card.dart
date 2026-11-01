@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:tutor_letter_gen/models/issue.dart';
+import 'package:tutor_letter_gen/models/criteria.dart';
+import 'package:tutor_letter_gen/models/criteria_type.dart';
 
 class IssueCard extends StatelessWidget {
-  final Issue issue;
+  final Criteria issue;
 
   const IssueCard({super.key, required this.issue});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: issue.isWarning ? Colors.yellow[50] : Colors.red[50],
+      color: issue.type == CriteriaType.recommendation
+          ? Colors.yellow[50]
+          : Colors.red[50],
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: issue.isWarning ? Colors.orange : Colors.red,
+          color: issue.type == CriteriaType.recommendation
+              ? Colors.orange
+              : Colors.red,
           width: 1.2,
         ),
       ),
@@ -26,21 +31,27 @@ class IssueCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  issue.isWarning ? Icons.warning_amber : Icons.error,
-                  color: issue.isWarning ? Colors.orange : Colors.red,
+                  issue.type == CriteriaType.recommendation
+                      ? Icons.warning_amber
+                      : Icons.error,
+                  color: issue.type == CriteriaType.recommendation
+                      ? Colors.orange
+                      : Colors.red,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   issue.code,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: issue.isWarning ? Colors.orange : Colors.red,
+                        color: issue.type == CriteriaType.recommendation
+                            ? Colors.orange
+                            : Colors.red,
                       ),
                 ),
-                if (issue.excelId != null) ...[
+                ...[
                   const Spacer(),
                   Text(
-                    "#${issue.excelId}",
+                    "#${issue.id}",
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.grey[600],
                         ),
@@ -57,10 +68,10 @@ class IssueCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
 
-            if (issue.description.isNotEmpty) ...[
+            if (issue.reason.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                issue.description,
+                issue.reason,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Colors.grey[700],
                       fontStyle: FontStyle.italic,

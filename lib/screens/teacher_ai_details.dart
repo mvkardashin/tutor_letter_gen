@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tutor_letter_gen/models/teacher/teacherAI.dart';
+import 'package:tutor_letter_gen/models/teacher/teacher_ai.dart';
 
 class TeacherAIDetails extends StatefulWidget {
   final TeacherAI teacher;
@@ -78,6 +78,7 @@ class _TeacherAIDetailsState extends State<TeacherAIDetails> {
           _buildRow("Категории", t.categories.toString()),
           _buildRow("Позиции", t.positions.toString()),
           _buildRow("Цены", t.lessonsPretty),
+          _buildRow("Наценки", t.surcharges),
           _buildRow("Время у себя", t.timeLocalPretty),
           _buildRow("Время выезда", t.timeDeparturePretty),
           _buildRow("Время онлайн", t.timeRemotePretty),

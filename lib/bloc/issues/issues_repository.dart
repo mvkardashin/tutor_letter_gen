@@ -1,37 +1,36 @@
-import 'package:tutor_letter_gen/models/issue.dart';
 import 'package:tutor_letter_gen/models/teacher/teacher.dart';
 
 abstract class IssuesRepositoryImpl {
-  Future<List<Issue>> fetchAiIssues({required Teacher teacher});
-  Future<List<Issue>> checkMechIssues({required Teacher teacher});
-  Future<List<Issue>> loadIssues({required Teacher teacher});
-  Future<List<Issue>> fetchAllIssues({required Teacher teacher});
+  Future<List<String>> fetchAiIssues(
+      {required Teacher teacher, required String aiErrors});
+  Future<String> fetchai(
+      {required String systemPrompt, required String userPrompt});
+  Future<List<String>> checkMechIssues({required Teacher teacher});
+  Future<List<String>> loadIssues({required Teacher teacher});
+  Future<List<String>> fetchAllIssues(
+      {required Teacher teacher, required String aiErrors});
+  // Future<List<String>> fetchPersonalBatchIssue({required Teacher teacher});
 }
 
 class IssuesRepository implements IssuesRepositoryImpl {
+  List<String> issues = [];
   @override
-  Future<List<Issue>> fetchAiIssues({required Teacher teacher}) async {
-    // Simulate fetching issues from an API or database
+  Future<List<String>> fetchAiIssues(
+      {required Teacher teacher, required String aiErrors}) async {
     List<String> response = ["NATIVE_TUTOR"];
-    // await Future.delayed(Duration(seconds: 1));
-    List<Issue> issues = response.map((code) => Issue.fromCode(code)).toList();
-    return issues;
+    return response;
   }
 
   @override
-  Future<List<Issue>> loadIssues({required Teacher teacher}) async {
-    // Simulate loading issues from local storage
-    // final ApiService _apiService = ApiService();
+  Future<List<String>> loadIssues({required Teacher teacher}) async {
     List<String> response = ["NATIVE_TUTOR"];
-    // await Future.delayed(Duration(seconds: 1));
-    List<Issue> issues = response.map((code) => Issue.fromCode(code)).toList();
-    return issues;
+    return response;
   }
 
   @override
-  Future<List<Issue>> checkMechIssues({required Teacher teacher}) async {
-    List<Issue> issues = [];
-    final checks = <Issue?>[
+  Future<List<String>> checkMechIssues({required Teacher teacher}) async {
+    List<String> issues = [];
+    final checks = <String?>[
       teacher.checkOgeAgeRequire,
       teacher.checkFullname,
       teacher.checkLocalGeo,
@@ -52,11 +51,22 @@ class IssuesRepository implements IssuesRepositoryImpl {
   }
 
   @override
-  Future<List<Issue>> fetchAllIssues({required Teacher teacher}) {
+  Future<List<String>> fetchAllIssues(
+      {required Teacher teacher, required String aiErrors}) async {
     // Combine AI and mechanical issues
-    return Future.wait([
-      fetchAiIssues(teacher: teacher),
+    issues = await Future.wait([
+      fetchAiIssues(teacher: teacher, aiErrors: aiErrors),
       checkMechIssues(teacher: teacher)
     ]).then((lists) => lists.expand((list) => list).toList());
+    return issues;
+  }
+
+  @override
+  Future<String> fetchai(
+      {required String systemPrompt, required String userPrompt}) async {
+    // String response = await ApiService()
+    //     .fetchAiIssues(errorPrompt: systemPrompt, teacherJson: userPrompt);
+    String response = '';
+    return response;
   }
 }

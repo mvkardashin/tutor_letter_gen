@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:tutor_letter_gen/models/criteria.dart';
 
 class LetterState {
@@ -8,6 +9,7 @@ class LetterState {
   final String recsHeadline;
   final String endText;
   final String withRespect;
+  // final List<String> codes;
   final List<Criteria> errors;
   final List<Criteria> recommendation;
 
@@ -18,8 +20,9 @@ class LetterState {
     required this.errorsHeadline,
     required this.recsHeadline,
     required this.endText,
-    required this.errors,
     required this.withRespect,
+    // required this.codes,
+    required this.errors,
     required this.recommendation,
   });
 
@@ -33,6 +36,7 @@ class LetterState {
         endText =
             'Пожалуйста, не забудьте, после внесения изменений, отправить анкету на проверку.',
         withRespect = 'С уважением, администратор Сервиса.',
+        // codes = const <String>[],
         errors = const <Criteria>[],
         recommendation = const <Criteria>[];
 
@@ -41,8 +45,10 @@ class LetterState {
   }
 
   String _buildHtmlList(List<Criteria> items) {
-    final listItems = items.map((e) => e.htmlLi).join();
-    return "<ul>$listItems</ul>";
+    final sortedItems = List<Criteria>.from(items)
+      ..sort((a, b) => a.id.compareTo(b.id));
+    final listItems = sortedItems.map((e) => e.card).join();
+    return listItems;
   }
 
   String get errorsText => _buildListText(errors);
@@ -56,12 +62,16 @@ class LetterState {
   }
 
   String get greetingsHtml => _wrapHtml(greetings, 'div');
-  String get acceptTeacherHtml => _wrapHtml(acceptTeacher, 'div');
-  String get deniedTeacherHtml => _wrapHtml(deniedTeacher, 'div');
+  String get acceptTeacherHtml => """<div style="padding:16px;">
+<h2 style="margin:0; font-size:18px; color:black;">✅ Ваша анкета опубликована</h2>
+</div>""";
+  String get deniedTeacherHtml => """<div style="padding:16px;">
+<h2 style="margin:0; font-size:18px; color:black;">⚠️ Ваша анкета возвращена на доработку</h2>
+</div>""";
   String get errorsHeadlineHtml =>
-      _wrapHtml(errorsHeadline, 'h2', style: 'padding-left:20px');
+      _wrapHtml(errorsHeadline, 'h2', style: 'padding-left:0px');
   String get recsHeadlineHtml =>
-      _wrapHtml(recsHeadline, 'h2', style: 'padding-left:20px');
+      _wrapHtml(recsHeadline, 'h2', style: 'padding-left:0px');
   String get endTextHtml => _wrapHtml(endText, 'p');
   String get withRespectHtml => _wrapHtml(withRespect, 'p');
 
@@ -70,7 +80,7 @@ class LetterState {
     final hasRecs = recommendation.isNotEmpty;
 
     return [
-      if (hasErrors) greetings,
+      greetings,
       hasErrors ? deniedTeacher : acceptTeacher,
       if (hasErrors) errorsHeadline,
       errorsText,
@@ -86,7 +96,7 @@ class LetterState {
     final hasRecs = recommendation.isNotEmpty;
 
     final content = [
-      if (hasErrors) greetingsHtml,
+      greetingsHtml,
       hasErrors ? deniedTeacherHtml : acceptTeacherHtml,
       if (hasErrors) errorsHeadlineHtml,
       errorsHtml,
@@ -96,7 +106,7 @@ class LetterState {
       if (!hasErrors) withRespectHtml,
     ].join();
 
-    return '<html><body>$content</body></html>';
+    return "<html><body ><div style='background-color:white;padding:20px'>$content</div></body></html>";
   }
 
   LetterState copyWith({

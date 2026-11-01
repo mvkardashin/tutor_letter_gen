@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'package:flutter/services.dart' show rootBundle;
-
 final Map<int, String> ageCategories = {
   1: "Дошкольники",
   2: "Школьники с 1 по 4 класс",

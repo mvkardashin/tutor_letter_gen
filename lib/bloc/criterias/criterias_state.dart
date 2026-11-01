@@ -1,13 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import '/models/criterias.dart';
+import 'package:tutor_letter_gen/models/criteria.dart';
+
 import '/models/status.dart';
 
 class CriteriasState {
   final Status status;
   final bool canUpdate;
   final String fetchedCriterias;
-  final Criterias criterias;
-  final Criterias filteredCriterias;
+  final List<Criteria> criterias;
+  final List<Criteria> filteredCriterias;
 
   CriteriasState(
       {required this.status,
@@ -18,8 +19,8 @@ class CriteriasState {
 
   CriteriasState copyWith({
     Status? status,
-    Criterias? criterias,
-    Criterias? filteredCriterias,
+    List<Criteria>? criterias,
+    List<Criteria>? filteredCriterias,
     bool? canUpdate,
     String? fetchedCriterias,
   }) {
@@ -52,5 +53,14 @@ class CriteriasState {
         other.fetchedCriterias == fetchedCriterias &&
         other.criterias == criterias &&
         other.filteredCriterias == filteredCriterias;
+  }
+
+  String get aiErrors => criterias
+      .where((cr) => cr.checkType == CheckType.ai)
+      .map((e) => '{prompt: ${e.prompt}, code: ${e.code}}')
+      .join('\n');
+
+  List<Criteria> criteriasForIssues(List<String> issues) {
+    return criterias.where((c) => issues.contains(c.code)).toList();
   }
 }

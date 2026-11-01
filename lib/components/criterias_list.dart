@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tutor_letter_gen/bloc/letter/letter_state.dart';
+import 'package:tutor_letter_gen/models/criteria_type.dart';
 
 import '/bloc/criterias/criterias_event.dart';
 import '/bloc/criterias/criterias_state.dart';
@@ -72,45 +74,55 @@ class _CriteriasListState extends State<CriteriasList> {
                         'Ошибки',
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
-                      ...state.filteredCriterias.errors
-                          .map((e) => CriteriaComponent(
-                                element: e,
-                                list: context.watch<LetterBloc>().state.errors,
-                                onAdd: () {
-                                  context
-                                      .read<LetterBloc>()
-                                      .add(AddInLetter(criteria: e));
+                      ...state.filteredCriterias
+                          .where((cr) => cr.type == CriteriaType.error)
+                          .map((e) =>
+                              BlocSelector<LetterBloc, LetterState, bool>(
+                                selector: (state) => state.errors.contains(e),
+                                builder: (context, isSelected) {
+                                  return CriteriaComponent(
+                                    element: e,
+                                    isSelected: isSelected,
+                                    onAdd: () {
+                                      context
+                                          .read<LetterBloc>()
+                                          .add(AddInLetter(criteria: e));
+                                    },
+                                    onDelete: () {
+                                      context
+                                          .read<LetterBloc>()
+                                          .add(DeleteFromLetter(criteria: e));
+                                    },
+                                  );
                                 },
-                                onDelete: () {
-                                  context
-                                      .read<LetterBloc>()
-                                      .add(DeleteFromLetter(criteria: e));
-                                },
-                              ))
-                          .toList(),
+                              )),
                       Text(
                         'Рекомендации',
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
-                      ...state.filteredCriterias.recs
-                          .map((e) => CriteriaComponent(
-                                element: e,
-                                list: context
-                                    .watch<LetterBloc>()
-                                    .state
-                                    .recommendation,
-                                onAdd: () {
-                                  context
-                                      .read<LetterBloc>()
-                                      .add(AddInLetter(criteria: e));
+                      ...state.filteredCriterias
+                          .where((cr) => cr.type == CriteriaType.recommendation)
+                          .map((e) =>
+                              BlocSelector<LetterBloc, LetterState, bool>(
+                                selector: (state) =>
+                                    state.recommendation.contains(e),
+                                builder: (context, isSelected) {
+                                  return CriteriaComponent(
+                                    element: e,
+                                    isSelected: isSelected,
+                                    onAdd: () {
+                                      context
+                                          .read<LetterBloc>()
+                                          .add(AddInLetter(criteria: e));
+                                    },
+                                    onDelete: () {
+                                      context
+                                          .read<LetterBloc>()
+                                          .add(DeleteFromLetter(criteria: e));
+                                    },
+                                  );
                                 },
-                                onDelete: () {
-                                  context
-                                      .read<LetterBloc>()
-                                      .add(DeleteFromLetter(criteria: e));
-                                },
-                              ))
-                          .toList(),
+                              )),
                     ],
                   ),
                 ),
